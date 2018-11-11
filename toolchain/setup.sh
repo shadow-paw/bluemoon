@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-INSTALL_PATH="$HOME/opt/cross"
+INSTALL_PATH="$HOME/.local/cross"
 MAKE_J=4
 
 BINUTILS_URL=http://ftp.gnu.org/gnu/binutils/binutils-2.31.tar.bz2
@@ -31,6 +31,7 @@ EOM
     case $choice in
     1)
         detect_host
+        install_mtools
         install_nasm
         install_binutils "i686-elf"
         install_gcc      "i686-elf"
@@ -40,6 +41,7 @@ EOM
         ;;
     2)
         detect_host
+        install_mtools
         install_nasm
         install_binutils "x86_64-elf"
         install_gcc      "x86_64-elf"
@@ -49,6 +51,7 @@ EOM
         ;;
     3)
         detect_host
+        install_mtools
         install_binutils "arm-none-eabi"
         install_gcc      "arm-none-eabi"
         install_gdb      "arm-none-eabi"
@@ -57,6 +60,7 @@ EOM
         ;;
     4)
         detect_host
+        install_mtools
         install_binutils "aarch64-none-elf"
         install_gcc      "aarch64-none-elf"
         install_gdb      "aarch64-none-elf"
@@ -65,6 +69,7 @@ EOM
         ;;
     A|a)
         detect_host
+        install_mtools
         install_nasm
         install_binutils "i686-elf"
         install_gcc      "i686-elf"
@@ -242,6 +247,19 @@ function install_gdb {
         echo "[I] Successfully installed gdb for ${TARGET}..."
     )
     rm -rf "build-gdb-${TARGET}"
+}
+
+function install_mtools {
+    case "${HOST}" in
+    macosx )
+        echo "[ ] brew install mtools"
+        brew install qemu
+        ;;
+    linux )
+        echo "[ ] sudo apt-get install -y mtools"
+        sudo apt-get install -y mtools
+        ;;
+    esac
 }
 
 function install_qemu {

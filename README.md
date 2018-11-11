@@ -20,11 +20,7 @@ To run bluemoon on emulator, we need to create a virtual disk image.
 ```
 make image
 ```
-This will create a 10MB empty image on `dist/bluemoon.img`, now mount it to `rootfs`:
-```
-make mount
-```
-(By default it uses `/dev/loop0`, adjust `Makefile` if needed)  
+This will create a 10MB empty image on `dist/bluemoon.img`  
 Next, install the boot loader:
 ```
 make boot

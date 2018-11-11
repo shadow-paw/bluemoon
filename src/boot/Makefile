@@ -26,8 +26,7 @@ $(MBR_BIN): $(MBR_ASM)
 	@$(AS) -f bin $< -o $@
 install-mbr: mbr
 	@echo "[COPY] $(MBR_BIN)"
-	@dd if="$(MBR_BIN)" of="$(IMAGE_FILE)" bs=446 count=1 conv=notrunc > /dev/null 2>&1
-	@sync
+	@dd if="$(MBR_BIN)" of="$(IMAGE_FILE)" bs=1 count=446 conv=notrunc > /dev/null 2>&1
 
 #################################################
 # VBR
@@ -58,8 +57,7 @@ $(BOOT_BIN): $(BOOT_ASM)
 	@$(AS) -f bin $< -o $@
 install-boot: boot
 	@echo "[COPY] $(BOOT_BIN)"
-	@cp "$(BOOT_BIN)" "$(ROOTFS)/"
-	@sync
+	mcopy -i "$(IMAGE_FILE)@@1M" "$(BOOT_BIN)" ::
 
 clean:
 	@-rm -f "$(MBR_BIN)" "$(VBR_BIN)" "$(BOOT_BIN)"

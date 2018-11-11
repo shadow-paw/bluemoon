@@ -2,7 +2,7 @@
 
 WARN    =-Wall -Wextra -Wno-unused-parameter -Wno-multichar
 CFLAGS  =-O3 -c $(WARN)
-CXXFLAGS=-O3 -c $(WARN)
+CXXFLAGS=-std=c++14 -O3 -c $(WARN)
 
 BIN_PATH=../../../bin
 PROJECT_BIN :=$(BIN_PATH)/mkosimage
