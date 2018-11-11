@@ -36,3 +36,8 @@
 # toolchain setup
 toolchain/
 !toolchain/*.sh
+
+.build/
+dist/
+bin/
+rootfs/
