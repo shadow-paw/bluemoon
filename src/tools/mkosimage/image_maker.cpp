@@ -62,7 +62,7 @@ bool ImageMaker::vbr_init(FILE * fp, uint32_t start, uint32_t count) {
     buffer[0x10] = 2;                                     // 0x10:  1: number of allocation tables
     v16 = 512; memcpy(&buffer[0x11], &v16, sizeof(v16));  // 0x11:  2: number of root entries
     v16 = volume_sectors < 65536 ? static_cast<uint16_t>(volume_sectors) : 0;
-    v16 = 1; memcpy(&buffer[0x13], &v16, sizeof(v16));    // 0x13:  2: total number of sectors in volume
+    memcpy(&buffer[0x13], &v16, sizeof(v16));             // 0x13:  2: total number of sectors in volume
     buffer[0x15] = 0xF8;                                  // 0x15:  1: media type, F8 for HDD
     v16 = static_cast<uint16_t>(fat_sectors);
     memcpy(&buffer[0x16], &v16, sizeof(v16));             // 0x16:  2: number of sectors per FAT
