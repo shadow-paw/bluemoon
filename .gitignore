@@ -41,3 +41,5 @@ toolchain/
 dist/
 bin/
 rootfs/
+
+.gdb_history

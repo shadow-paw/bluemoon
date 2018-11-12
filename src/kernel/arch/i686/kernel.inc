@@ -1,0 +1,71 @@
+%ifndef __BLUEMOON_KERNEL__
+%define __BLUEMOON_KERNEL__
+
+; Address Translation used at early kernel stage
+; ----------------------------------------------
+%define KADDR_ZERO_VMA   (0xE0000000)
+%define KADDR_KERNEL_PMA (0x00100000 + 4096)
+%define KADDR_KERNEL_VMA (KADDR_ZERO_VMA + KADDR_KERNEL_PMA)
+%define KADDR_BOOTDATA   (KADDR_ZERO_VMA + 0x0600)
+%define KADDR_PMA(x)     ((x) - KADDR_ZERO_VMA)
+
+; Selector ID
+; ----------------------------------------------
+%define SEG_CODE32_0 (0x08)
+%define SEG_DATA32_0 (0x10)
+%define SEG_CODE32_3 (0x18)
+%define SEG_DATA32_3 (0x20)
+%define SEG_TSS      (0x28)
+
+; Interrupt Numbering
+; ----------------------------------------------
+%define IRQ_BASE_INTNUM (0x20)
+
+; TSS32
+; ----------------------------------------------
+struc TSS32
+    tss32_plink     resw    1
+                    resw    1
+    tss32_esp0      resd    1
+    tss32_ss0       resd    1
+    tss32_esp1      resd    1
+    tss32_ss1       resd    1
+    tss32_esp2      resd    1
+    tss32_ss2       resd    1
+    tss32_cr3       resd    1
+    tss32_eip       resd    1
+    tss32_eflags    resd    1
+    tss32_eax       resd    1
+    tss32_ecx       resd    1
+    tss32_edx       resd    1
+    tss32_ebx       resd    1
+    tss32_esp       resd    1
+    tss32_ebp       resd    1
+    tss32_esi       resd    1
+    tss32_edi       resd    1
+    tss32_es        resd    1
+    tss32_cs        resd    1
+    tss32_ss        resd    1
+    tss32_ds        resd    1
+    tss32_fs        resd    1
+    tss32_gs        resd    1
+    tss32_ldts      resd    1
+    tss32_trap      resw    1
+    tss32_iobase    resw    1
+endstruc
+
+; --------------------------------------
+; Call
+; --------------------------------------
+%macro call 1-*
+    %define _proc %1
+    %assign _argc (%0-1)*4
+    %rep %0 -1
+        %rotate -1 
+        push    %1
+    %endrep
+    call _proc
+    add esp, _argc
+%endmacro
+
+%endif

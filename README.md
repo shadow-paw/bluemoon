@@ -27,6 +27,16 @@ make boot
 ```
 Launch emulator:
 ```
-make run-i686
-make run-x86_64
+make i686-run
+make x86_64-run
+```
+Using GDB:
+```
+make i686-debug
+make x86_64-debug
+```
+This starts qemu in debug mode. You need to open up another terminal and run:
+```
+make i686-gdb
+make x86_64-gdb
 ```
