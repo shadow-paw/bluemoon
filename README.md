@@ -1,4 +1,4 @@
-# bluemoon
+# Bluemoon [![TravisCI][travis-image]][travis-url]
 > Hobby operating system
 
 ### Getting Started
@@ -40,3 +40,7 @@ This starts qemu in debug mode. You need to open up another terminal and run:
 make i686-gdb
 make x86_64-gdb
 ```
+
+<!-- Markdown link & img dfn's -->
+[travis-image]: https://travis-ci.org/shadow-paw/bluemoon.svg?branch=master
+[travis-url]: https://travis-ci.org/shadow-paw/bluemoon

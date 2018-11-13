@@ -1,0 +1,13 @@
+branches:
+  only:
+    - master
+matrix:
+  include:
+    - language: cpp
+      os: linux
+      before_install:
+        - pip install --user cpplint
+      script:
+        - make lint
+notifications:
+  email: false

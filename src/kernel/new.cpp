@@ -2,7 +2,7 @@
 
 /// Implement c++ new with kernel malloc
 void* operator new(size_t s) throw() {
-	return nullptr;
+    return nullptr;
 }
 void* operator new(size_t, void* p) throw() {
     return p;

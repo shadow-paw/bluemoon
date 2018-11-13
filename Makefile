@@ -1,4 +1,4 @@
-.PHONY: all image image-delete image-ls boot i686 i686-run i686-debug i686-gdb x86_64 x86_64-run x86_64-debug x86_64-gdb clean
+.PHONY: all image image-delete image-ls boot i686 i686-run i686-debug i686-gdb x86_64 x86_64-run x86_64-debug x86_64-gdb lint clean
 
 IMAGE_FILE=`pwd`/dist/bluemoon.img
 # QEMU_FLAGS=-m 32 -vga std -serial stdio
@@ -85,6 +85,10 @@ x86_64-gdb:
 	  --eval-command="set architecture i386:x86-64" \
 	  --eval-command="target remote localhost:1234" \
 	  --symbols=src/kernel/.build/x86_64/kernel64.sym
+
+lint:
+	@ARCH=i686 make --no-print-directory -C src/kernel lint
+	@ARCH=x86_64 make --no-print-directory -C src/kernel lint
 
 clean:
 	@-make --no-print-directory -C src/boot clean
