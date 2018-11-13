@@ -9,14 +9,14 @@ else ifeq ($(ARCH),x86_64)
   ASM=nasm -felf64
   KERNEL_FILE=kernel64.bin
 else
-  $(error "USAGE: ROOTFS=xxx ARCH=i686|x86_64 make [install]")
+  $(error "USAGE: IMAGE_FILE=xxx ARCH=i686|x86_64 make [install]")
 endif
-CC      =$(ARCH)-elf-gcc
-CXX     =$(ARCH)-elf-g++
-LD      =$(ARCH)-elf-ld
-AR      =$(ARCH)-elf-ar -rcs
-OBJCOPY =$(ARCH)-elf-objcopy
-LIBGCC  =$(shell $(CC) -print-libgcc-file-name)
+CC      :=$(ARCH)-elf-gcc
+CXX     :=$(ARCH)-elf-g++
+LD      :=$(ARCH)-elf-ld
+AR      :=$(ARCH)-elf-ar -rcs
+OBJCOPY :=$(ARCH)-elf-objcopy
+LIBGCC  :=$(shell $(CC) -print-libgcc-file-name 2>/dev/null)
 
 # Compiler Flags
 ########################
@@ -42,6 +42,8 @@ CXXFLAGS =-ffreestanding -masm=intel -std=c++14 -O2  \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
           -fno-exceptions -fno-rtti -fno-stack-protector -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CXXWARN)
 LDFLAGS  =-nostdinc -nostdlib
+CPPLINTFLAGS=--quiet --linelength=200 --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo
+CLINTFLAGS  =--quiet --linelength=200 --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo,-readability/casting
 
 
 all: kernel
@@ -100,6 +102,12 @@ install: kernel
 	@echo "[COPY] $(notdir $(KERNEL_BIN))"
 	@mdel -i "$(IMAGE_FILE)@@1M" ::$(shell echo $(notdir $(KERNEL_BIN)) | tr a-z A-Z) > /dev/null 2>&1 || true
 	@mcopy -i "$(IMAGE_FILE)@@1M" $(KERNEL_BIN) ::$(shell echo $(notdir $(KERNEL_BIN)) | tr a-z A-Z)
+
+##############################################################
+lint:
+	@echo "[LINT] $(notdir $(KERNEL_BIN))"
+	@cpplint $(CLINTFLAGS) $(KERNEL_C)
+	@cpplint $(CPPLINTFLAGS) $(KERNEL_CPP)
 
 ##############################################################
 clean:
