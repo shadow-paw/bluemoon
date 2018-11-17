@@ -1,5 +1,5 @@
-#ifndef __BLUEMOON_KDEBUG_H__
-#define __BLUEMOON_KDEBUG_H__
+#ifndef KERNEL_KDEBUG_H_
+#define KERNEL_KDEBUG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,4 +12,4 @@ extern "C" {
 };
 #endif
 
-#endif // __BLUEMOON_KDEBUG_H__
+#endif  // KERNEL_KDEBUG_H_

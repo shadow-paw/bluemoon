@@ -1,5 +1,5 @@
-#ifndef	__BLUEMOON_KERNEL_H__
-#define	__BLUEMOON_KERNEL_H__
+#ifndef KERNEL_KERNEL_H_
+#define KERNEL_KERNEL_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -17,4 +17,4 @@ extern "C" {
 };
 #endif
 
-#endif // __BLUEMOON_KERNEL_H__
+#endif  // KERNEL_KERNEL_H_

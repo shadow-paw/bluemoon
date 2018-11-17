@@ -1,5 +1,5 @@
-#ifndef __BLUEMOON_KERNEL_INLINE_ASM_H__
-#define __BLUEMOON_KERNEL_INLINE_ASM_H__
+#ifndef KERNEL_ARCH_I686_INLINEASM_H__
+#define KERNEL_ARCH_I686_INLINEASM_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -7,12 +7,12 @@
 // -------------------------------------------------
 #define _INT_DISABLE()  __asm volatile("pushf\ncli")
 #define _INT_RESTORE()  __asm volatile("popf")
-static inline void _CLI() { __asm volatile ( "cli" );    }
-static inline void _STI() { __asm volatile ( "sti" );    }
-static inline void _HLT() { __asm volatile ( "hlt" );    }
+static inline void _CLI() { __asm volatile ("cli"); }
+static inline void _STI() { __asm volatile ("sti"); }
+static inline void _HLT() { __asm volatile ("hlt"); }
 
 // -------------------------------------------------
-static inline void _WRMSR (uint32_t msr, uint64_t value) {
+static inline void _WRMSR(uint32_t msr, uint64_t value) {
     __asm__ volatile ("wrmsr"
                       :
                       : "c" (msr), "A" (value)
@@ -28,10 +28,10 @@ static inline uint64_t _RDMSR(uint32_t msr) {
 }
 // -------------------------------------------------
 static inline void _MOVCR3(uint32_t paddr) {
-    __asm volatile( "mov cr3, %0" : : "r"(paddr) : "memory" );
+    __asm volatile("mov cr3, %0" : : "r"(paddr) : "memory");
 }
 static inline void _INVLPG(uint32_t addr) {
-    __asm volatile( "invlpg [%0]" : : "r"(addr) : "memory" );
+    __asm volatile("invlpg [%0]" : : "r"(addr) : "memory");
 }
 // -------------------------------------------------
 
@@ -62,4 +62,4 @@ static inline void _SPIN_UNLOCK(_SPINLOCK* lock) {
     *lock = 0;
 }
 
-#endif // __BLUEMOON_KERNEL_INLINE_ASM_H__
+#endif  // KERNEL_ARCH_I686_INLINEASM_H__
