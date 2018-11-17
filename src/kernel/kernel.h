@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "kaddr.h"
-#include "inline_asm.h"
+#include "inlineasm.h"
 #include "kdebug.h"
 
 #ifdef __cplusplus

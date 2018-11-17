@@ -59,12 +59,12 @@ bootstrap:
     add     eax, 4096
     cmp     eax, ebx
     jb      .1
-    
+
     mov     cr3, esi
     mov     eax, cr0
     or      eax, 0x80000000
     mov     cr0, eax
-    ; eip -> 3.75G
+    ; eip -> higher end of address space
     mov     eax, dword .HigherHalf
     jmp     eax
 .HigherHalf:
@@ -100,7 +100,6 @@ bootstrap:
     mov     [gdt+SEG_TSS+4], eax
     mov     eax, SEG_TSS
     ltr     ax
-
     ; Setup minimal C environment
     xor     ebp, ebp
     ; Constructors

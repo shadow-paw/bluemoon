@@ -4,11 +4,11 @@ IMAGE_FILE=`pwd`/dist/bluemoon.img
 
 
 ifdef SSH_CLIENT
-  # QEMU_FLAGS=-m 32 -nographic -curses
   QEMU_FLAGS=-m 32 -nographic
+  #QEMU_FLAGS+=-curses
 else ifdef SSH_TTY
-  # QEMU_FLAGS=-m 32 -nographic -curses
   QEMU_FLAGS=-m 32 -nographic
+  #QEMU_FLAGS+=-curses
 else
   QEMU_FLAGS=-m 32 -vga cirrus -serial stdio
 endif

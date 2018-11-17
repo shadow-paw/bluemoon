@@ -1,5 +1,5 @@
-#ifndef KERNEL_ARCH_I686_INLINEASM_H__
-#define KERNEL_ARCH_I686_INLINEASM_H__
+#ifndef KERNEL_ARCH_X86_64_INLINEASM_H__
+#define KERNEL_ARCH_X86_64_INLINEASM_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -26,11 +26,12 @@ static inline uint64_t _RDMSR(uint32_t msr) {
                       );
     return value;
 }
+
 // -------------------------------------------------
-static inline void _MOVCR3(uint32_t physcal_addr) {
-    __asm volatile("mov cr3, %0" : : "r"(physcal_addr) : "memory");
+static inline void _MOVCR3(uint64_t paddr) {
+    __asm volatile("mov cr3, %0" : : "r"(paddr) : "memory");
 }
-static inline void _INVLPG(uint32_t addr) {
+static inline void _INVLPG(uint64_t addr) {
     __asm volatile("invlpg [%0]" : : "r"(addr) : "memory");
 }
 // -------------------------------------------------
@@ -60,4 +61,4 @@ static inline void _SPIN_UNLOCK(_SPINLOCK* lock) {
     *lock = 0;
 }
 
-#endif  // KERNEL_ARCH_I686_INLINEASM_H__
+#endif  // KERNEL_ARCH_X86_64_INLINEASM_H__
