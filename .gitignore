@@ -43,3 +43,4 @@ bin/
 rootfs/
 
 .gdb_history
+.vscode/

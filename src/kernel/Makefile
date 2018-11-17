@@ -36,9 +36,9 @@ CXXWARN  =-Wall -Wextra -Wattributes -Wbuiltin-macro-redefined -Wcast-align -Wco
           -Wtype-limits -Wuninitialized -Wwrite-strings                                          \
           -Wno-unused-parameter -Wno-unused-variable -Wno-multichar -Wno-unused-but-set-variable \
           -Wc++0x-compat  -Wsign-promo
-CFLAGS   =-ffreestanding -masm=intel -std=c99 -O2  \
+CFLAGS   =-fPIC -ffreestanding -masm=intel -std=c99 -O2 \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CWARN)
-CXXFLAGS =-ffreestanding -masm=intel -std=c++14 -O2  \
+CXXFLAGS =-fPIC -ffreestanding -masm=intel -std=c++14 -O2 \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
           -fno-exceptions -fno-rtti -fno-stack-protector -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CXXWARN)
 LDFLAGS  =-nostdinc -nostdlib
