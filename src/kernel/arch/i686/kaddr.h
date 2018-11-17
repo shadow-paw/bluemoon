@@ -1,5 +1,5 @@
-#ifndef	__BLUEMOON_KADDR_H__
-#define	__BLUEMOON_KADDR_H__
+#ifndef KERNEL_ARCH_I686_KADDR_H_
+#define KERNEL_ARCH_I686_KADDR_H_
 
 // Physical Address of kernel (1MB + 4096 ELF Header)
 // ----------------------------------------------
@@ -31,7 +31,7 @@
 // ----------------------------------------------
 #define MMU_RECURSIVE_SLOT      (1023UL)
 
-// User-space address layout (0MB ~ 256MB) 
+// User-space address layout (0MB ~ 256MB)
 // ----------------------------------------------
 #define APPADDR_PROCESS_STACK   (0x7FC00000)
 #define APPADDR_PROCESS_HEADER  (APPADDR_PROCESS_STACK  + 4096)
@@ -48,4 +48,4 @@
 // ----------------------------------------------
 typedef uint32_t    MMU_PADDR;
 
-#endif // __BLUEMOON_KADDR_H__
+#endif  // KERNEL_ARCH_I686_KADDR_H_

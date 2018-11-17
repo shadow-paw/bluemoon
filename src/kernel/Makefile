@@ -42,8 +42,8 @@ CXXFLAGS =-ffreestanding -masm=intel -std=c++14 -O2  \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
           -fno-exceptions -fno-rtti -fno-stack-protector -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CXXWARN)
 LDFLAGS  =-nostdinc -nostdlib
-CPPLINTFLAGS=--quiet --linelength=200 --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo
-CLINTFLAGS  =--quiet --linelength=200 --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo,-readability/casting
+CPPLINTFLAGS=--quiet --linelength=200 --root=src --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo
+CLINTFLAGS  =--quiet --linelength=200 --root=src --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo,-readability/casting
 
 
 all: kernel
@@ -55,11 +55,12 @@ all: kernel
 #
 ##############################################################
 KERNEL_TMP      :=.build/$(ARCH)/
-KERNEL_C        :=$(wildcard *.c)
-KERNEL_CPP      :=$(wildcard *.cpp)
-KERNEL_ARCH_ASM :=$(wildcard arch/$(ARCH)/*.asm)
-KERNEL_ARCH_C   :=$(wildcard arch/$(ARCH)/*.c)
-KERNEL_ARCH_CPP :=$(wildcard arch/$(ARCH)/*.cpp)
+KERNEL_C        :=$(sort $(wildcard *.c))
+KERNEL_CPP      :=$(sort $(wildcard *.cpp))
+KERNEL_ARCH_ASM :=$(sort $(wildcard arch/$(ARCH)/*.asm))
+KERNEL_ARCH_C   :=$(sort $(wildcard arch/$(ARCH)/*.c))
+KERNEL_ARCH_CPP :=$(sort $(wildcard arch/$(ARCH)/*.cpp))
+KERNEL_HEADER   :=$(sort $(wildcard *.h) $(wildcard arch/$(ARCH)/*.h))
 KERNEL_OBJ      :=$(patsubst %.c,    $(KERNEL_TMP)%_c.o,  $(KERNEL_C))     \
 	          $(patsubst %.cpp,  $(KERNEL_TMP)%_cpp.o,$(KERNEL_CPP))   \
                   $(patsubst arch/$(ARCH)/%.asm,  $(KERNEL_TMP)$(ARCH)-%_a.o,  $(KERNEL_ARCH_ASM))  \
@@ -107,7 +108,7 @@ install: kernel
 lint:
 	@echo "[LINT] $(notdir $(KERNEL_BIN))"
 	@cpplint $(CLINTFLAGS) $(KERNEL_C)
-	@cpplint $(CPPLINTFLAGS) $(KERNEL_CPP)
+	@cpplint $(CPPLINTFLAGS) $(KERNEL_HEADER) $(KERNEL_CPP)
 
 ##############################################################
 clean:

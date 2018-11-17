@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			".gdb_history": true,
+			"**/.build/": true,
+			"bin/": true,
+			"bluemoon.code-workspace": true,
+			"dist/": true,
+			"toolchain/": true
+		},
+		"files.trimTrailingWhitespace": true
+	}
+}
