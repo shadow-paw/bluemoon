@@ -3,6 +3,7 @@
 #include "bootdata.h"
 #include "mmu.h"
 #include "memory.h"
+#include "pic.h"
 
 void test_kmalloc() {
     char * foo = new char[8192];
@@ -17,6 +18,8 @@ void test_kmalloc() {
 extern "C" void kmain(void) {
     kprintf("Hello kernel!\n");
     mmu_init((const BOOTDATA*)KADDR_BOOTDATA);
+    pic_init();
+    _STI();
     test_kmalloc();
     kprintf("Goodbye kernel!\n");
 }
