@@ -2,6 +2,8 @@
 > Hobby operating system
 
 ### Getting Started
+While it is possible to do it on Windows, we make our life easier assume we do it on mac or linux.
+
 #### Install Toolchain
 We will need the following toolchain setup:
 - [nasm](https://www.nasm.us/)
@@ -24,6 +26,11 @@ This will create a 10MB empty image on `dist/bluemoon.img`
 Next, install the boot loader:
 ```
 make boot
+```
+Build kernel:
+```
+make i686
+make x86_64
 ```
 Launch emulator:
 ```
