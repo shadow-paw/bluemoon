@@ -11,7 +11,7 @@
 // MMU Page Allocator (-1GB ~ -0.5GB)
 // for 256GB memory there is 67108864 x 4K pages, requires 512 MiB
 // ----------------------------------------------
-#define KADDR_MMU_STACK         (0xFFFFFFFFC0000000)
+#define KADDR_MMU_PHYPOOL       (0xFFFFFFFFC0000000)
 
 // Kernel Zone (-2GB ~ -1GB)
 // ----------------------------------------------
@@ -45,9 +45,5 @@
 // ----------------------------------------------
 #define KADDR_INITRD            (0xFFFFFFFF80C00000)
 #define KADDR_DISPLAY           (0xFFFFFFFF8F000000)
-
-// Architecture specific type
-// ----------------------------------------------
-typedef uint64_t    MMU_PADDR;
 
 #endif  // KERNEL_ARCH_X86_64_KADDR_H_

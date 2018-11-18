@@ -8,16 +8,15 @@ extern kmain
 extern sbss, ebss, _kernel_end
 extern ctor_start, ctor_end, dtor_start, dtor_end
 
-%define KSTACK_SIZE (81902)
+%define KSTACK_SIZE (8192)
 
 section .bss
 ; ----------------------------------------------
 align 4096
-k_PDT  resb    4096
-k_PT   resb    4096
-kstack resb    KSTACK_SIZE
-tss    resb    104
-
+k_PDT  resb 4096
+k_PT   resb 4096
+kstack resb KSTACK_SIZE
+tss    resb 104
 
 section .data
 ; ----------------------------------------------
@@ -25,7 +24,6 @@ align 16
 gdtr    dw  6 *8 -1
         dd  gdt
         dw  0
-
 align 16
 gdt     dd  0, 0
         dd  0x0000FFFF, 0x00CF9A00              ; 0x08 CODE32 DPL0
@@ -33,7 +31,6 @@ gdt     dd  0, 0
         dd  0x0000FFFF, 0x00CFFA00              ; 0x18 CODE32 DPL3
         dd  0x0000FFFF, 0x00CFF200              ; 0x20 DATA32 DPL3
         dd  0, 0                                ; TSS
-
 
 section .text
 ; ----------------------------------------------

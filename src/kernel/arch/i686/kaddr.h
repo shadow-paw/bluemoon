@@ -8,7 +8,7 @@
 // MMU Page Allocator (-8MB ~ -4MB)
 // for 4GiB requires 4 MiB
 // ----------------------------------------------
-#define KADDR_MMU_STACK         (0xFF800000)
+#define KADDR_MMU_PHYPOOL       (0xFF800000)
 
 // Kernel Zone (-128MB ~ -TOP)
 // ----------------------------------------------
@@ -43,9 +43,5 @@
 // ----------------------------------------------
 #define KADDR_INITRD            (0xC0000000)
 #define KADDR_DISPLAY           (0xFE000000)
-
-// Architecture specific type
-// ----------------------------------------------
-typedef uint32_t    MMU_PADDR;
 
 #endif  // KERNEL_ARCH_I686_KADDR_H_

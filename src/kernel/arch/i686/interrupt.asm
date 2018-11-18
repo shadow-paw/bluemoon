@@ -3,9 +3,9 @@ bits 32
 
 %include "kernel.inc"
 
-global IDT_init, IDT_set
+global idt_init, idt_set
 extern INT_00, INT_01, INT_02, INT_03, INT_04, INT_05, INT_06, INT_07
-extern INT_08,         INT_0A, INT_0B, INT_0C, INT_0D, INT_0E, INT_0F 
+extern INT_08,         INT_0A, INT_0B, INT_0C, INT_0D, INT_0E, INT_0F
 extern INT_10, INT_11, INT_12, INT_13
 
 section .bss
@@ -22,31 +22,31 @@ idtr    dw  256*8-1
 
 section .text
 ; ----------------------------------------------
-IDT_init:
-    call    IDT_set, 0x00, dword _INT_00, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x01, dword _INT_01, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x02, dword _INT_02, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x03, dword _INT_03, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x04, dword _INT_04, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x05, dword _INT_05, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x06, dword _INT_06, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x07, dword _INT_07, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x08, dword _INT_08, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x0A, dword _INT_0A, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x0B, dword _INT_0B, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x0C, dword _INT_0C, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x0D, dword _INT_0D, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x0E, dword _INT_0E, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x10, dword _INT_10, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x11, dword _INT_11, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x12, dword _INT_12, 1000111000000000b    ; P DPL=0 TYPE=1110
-    call    IDT_set, 0x13, dword _INT_13, 1000111000000000b    ; P DPL=0 TYPE=1110
+idt_init:
+    call    idt_set, 0x00, dword _INT_00, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x01, dword _INT_01, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x02, dword _INT_02, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x03, dword _INT_03, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x04, dword _INT_04, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x05, dword _INT_05, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x06, dword _INT_06, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x07, dword _INT_07, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x08, dword _INT_08, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x0A, dword _INT_0A, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x0B, dword _INT_0B, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x0C, dword _INT_0C, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x0D, dword _INT_0D, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x0E, dword _INT_0E, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x10, dword _INT_10, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x11, dword _INT_11, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x12, dword _INT_12, 1000111000000000b    ; P DPL=0 TYPE=1110
+    call    idt_set, 0x13, dword _INT_13, 1000111000000000b    ; P DPL=0 TYPE=1110
     lidt    [idtr]
     ret
 
 ; ----------------------------------------------
-; IDT_set(num, function, access (P:1 DPL:2 0:1 TYPE:4 0:5)
-IDT_set:
+; idt_set(num, function, access (P:1 DPL:2 0:1 TYPE:4 0:5)
+idt_set:
     push    eax
     push    ecx
     push    edx
@@ -64,8 +64,8 @@ IDT_set:
     pop     ecx
     pop     eax
     ret
-        
-; INT00    
+
+; INT00
 ; ----------------------------------------------
 align 16
 _INT_00:
@@ -74,7 +74,7 @@ _INT_00:
     popa
     iretd
 
-; INT01   
+; INT01
 ; ----------------------------------------------
 align 16
 _INT_01:

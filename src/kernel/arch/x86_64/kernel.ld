@@ -1,26 +1,23 @@
 OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(bootstrap)
 
-
 KERNEL_PMA = 0x00100000;
 KERNEL_VMA = 0xFFFFFFFF80000000 + KERNEL_PMA +4096;
-
 
 SECTIONS
 {
     . = KERNEL_VMA;
     _kernel_start = .;
     . = ALIGN(4096);
-    
-    .text : AT(ADDR(.text) - KERNEL_VMA)
+
+    .text BLOCK(4096) :
     {
         *bootstrap*(.text)
         *(.text)
         *(.gnu.linkonce.t*)
         . = ALIGN(4096);
     }
-    
-    .rodata : AT(ADDR(.rodata) - KERNEL_VMA)
+    .rodata BLOCK(4096) :
     {
         ctor_start = .;
         *(SORT(.ctors*))
@@ -31,27 +28,20 @@ SECTIONS
 
         *(.rodata*)
         *(.gnu.linkonce.r*)
-        . = ALIGN(4096);
     }
-    
-
-    .data : AT(ADDR(.data) - KERNEL_VMA)
+    .data BLOCK(4096) :
     {
         *(.data)
         *(.gnu.linkonce.d*)
-        . = ALIGN(4096);
     }
-
-    .bss : AT(ADDR(.bss) - KERNEL_VMA)
+    .bss BLOCK(4096) :
     {
         sbss = .;
         *(.bss)
         *(COMMON)
         *(.gnu.linkonce.b*)
         ebss = .;
-        . = ALIGN(4096);
     }
-
     _kernel_end = .;
 
     /DISCARD/ :
