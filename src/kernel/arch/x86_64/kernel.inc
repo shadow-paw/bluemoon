@@ -1,7 +1,5 @@
-%ifndef __BLUEMOON_KERNEL__
-%define __BLUEMOON_KERNEL__
-
-
+%ifndef KERNEL_ARCH_X86_64_KERNEL_INC_
+%define KERNEL_ARCH_X86_64_KERNEL_INC_
 
 ; Address Translation used at early kernel stage
 ; ----------------------------------------------
@@ -13,7 +11,6 @@
 
 %define APPADDR_PROCESS_STACK   (0x7FC00000)
 
-
 ; Selector ID
 ; ----------------------------------------------
 %define SEG_CODE64_0    (0x08)
@@ -23,11 +20,9 @@
 %define SEG_CODE64_3    (0x28)
 %define SEG_TSS         (0x30)
 
-
 ; Interrupt Numbering
 ; ----------------------------------------------
 %define IRQ_BASE_INTNUM (0x20)
-
 
 ; TSS64
 ; ----------------------------------------------
@@ -47,8 +42,6 @@ struc TSS64
                     resd    2
     tss64_iobase    resd    1
 endstruc
-
-
 
 ; --------------------------------------
 ; Call Macro (AMD x86-64 ABI)
@@ -83,7 +76,4 @@ endstruc
     call    %1
 %endmacro
 
-
-
 %endif
-

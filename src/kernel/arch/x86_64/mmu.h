@@ -8,15 +8,17 @@
 #include "../../bootdata.h"
 
 // CPU DEFINED
-#define MMU_PROT_PRESENT    (0x0001)
-#define MMU_PROT_RO         (0x0000)
-#define MMU_PROT_RW         (0x0002)
-#define MMU_PROT_USER       (0x0004)
-#define MMU_PROT_MASK       (MMU_PROT_RO|MMU_PROT_RW|MMU_PROT_USER)
+#define MMU_PROT_PRESENT (0x0001)
+#define MMU_PROT_RO      (0x0000)
+#define MMU_PROT_RW      (0x0002)
+#define MMU_PROT_USER    (0x0004)
+#define MMU_PROT_MASK    (MMU_PROT_RO|MMU_PROT_RW|MMU_PROT_USER)
+// PAGE TABLE FLAG
+#define MMU_PAGE_ONDEMAND (0x0100)
+#define MMU_PAGE_MAPPHY   (0x0200)
 
-#define MMU_MMAP_MAPPHY         (1)
-#define MMU_MUNMAP_RELEASE      (0)
-#define MMU_MUNMAP_NORELEASE    (1)
+#define MMU_MUNMAP_RELEASE   (0)
+#define MMU_MUNMAP_NORELEASE (1)
 
 typedef uint64_t MMU_PHYADDR;
 

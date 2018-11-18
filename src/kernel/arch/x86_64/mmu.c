@@ -126,10 +126,6 @@ bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint64_t flag) {
     } return true;
 }
 bool mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag) {
-    uint64_t pageflag = 0;
-    if (flag & MMU_MMAP_MAPPHY) {
-        pageflag |= MMU_PAGE_MAPPHY;
-    }
     for (size_t off = 0; off < size; off += 4096) {
         if (!mmu_mark((const uint8_t*)mem + off, paddr+off, flag)) return false;
     } return true;

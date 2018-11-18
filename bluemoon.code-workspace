@@ -9,6 +9,7 @@
 			".gdb_history": true,
 			".vscode/": true,
 			"**/.build/": true,
+			"**/Makefile": true,
 			"bin/": true,
 			"bluemoon.code-workspace": true,
 			"dist/": true,
