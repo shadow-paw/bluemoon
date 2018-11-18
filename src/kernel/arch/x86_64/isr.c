@@ -37,19 +37,19 @@ void INT_08(void) {
     kprintf("INT08 : #DF Double Fault Exception.\n");
     __asm volatile ("cli; hlt");
 }
-void INT_0A(uint32_t code) {
+void INT_0A(uint64_t code) {
     kprintf("INT0A : #TS Invalid TSS Exception. CODE:%d\n", code);
     __asm volatile ("cli; hlt");
 }
-void INT_0B(uint32_t code) {
+void INT_0B(uint64_t code) {
     kprintf("INT0B : #NP Segment Not Present. CODE:%d\n", code);
     __asm volatile ("cli; hlt");
 }
-void INT_0C(uint32_t code) {
+void INT_0C(uint64_t code) {
     kprintf("INT0C : #SS Stack Fault Exception. CODE:%d\n", code);
     __asm volatile ("cli; hlt");
 }
-void INT_0D(uint32_t code, uint32_t ip) {
+void INT_0D(uint64_t code, uint64_t ip) {
     kprintf("INT0D : #GP General Protection Exception. IP: %X CODE:%d\n", ip, code);
     __asm volatile ("cli; hlt");
 }
@@ -58,7 +58,7 @@ void INT_10(void) {
     kprintf("INT10 : #MF x87 FPU Floating-Point Error.\n");
     __asm volatile ("cli; hlt");
 }
-void INT_11(uint32_t code) {
+void INT_11(uint64_t code) {
     kprintf("INT11 : #AC Alignment Check Exception. CODE:%d\n", code);
     __asm volatile ("cli; hlt");
 }

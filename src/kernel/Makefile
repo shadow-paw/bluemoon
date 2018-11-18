@@ -37,10 +37,12 @@ CXXWARN  =-Wall -Wextra -Wattributes -Wbuiltin-macro-redefined -Wcast-align -Wco
           -Wno-unused-parameter -Wno-unused-variable -Wno-multichar -Wno-unused-but-set-variable \
           -Wc++0x-compat  -Wsign-promo
 CFLAGS   =-fPIC -ffreestanding -masm=intel -std=c99 -O2 \
-          -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CWARN)
+          -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
+          -DARCH=$(ARCH) $(INCLUDE) -Werror $(CWARN)
 CXXFLAGS =-fPIC -ffreestanding -masm=intel -std=c++14 -O2 \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
-          -fno-exceptions -fno-rtti -fno-stack-protector -c -D_$(ARCH) -D_BITS32 $(INCLUDE) -Werror $(CXXWARN)
+          -fno-exceptions -fno-rtti -fno-stack-protector \
+          -DARCH=$(ARCH) $(INCLUDE) -Werror $(CXXWARN)
 LDFLAGS  =-nostdinc -nostdlib
 CPPLINTFLAGS=--quiet --linelength=200 --root=src --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo
 CLINTFLAGS  =--quiet --linelength=200 --root=src --filter=-legal/copyright,-build/include_subdir,-build/c++11,-readability/todo,-readability/casting
@@ -75,7 +77,7 @@ KERNEL_USELIB :=$(LIBGCC)
 
 kernel: $(KERNEL_BIN)
 $(KERNEL_BIN): $(KERNEL_TMP) $(KERNEL_OBJ) $(KERNEL_USELIB) Makefile
-	@echo [LINK] $(notdir $@)
+	@echo "[LINK] $(notdir $@)"
 	@$(LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld -o $@ $(KERNEL_OBJ) $(KERNEL_USELIB)
 	@$(OBJCOPY) --only-keep-debug $@ $(KERNEL_SYM)
 	@$(OBJCOPY) --strip-debug --strip-unneeded $@
@@ -85,17 +87,17 @@ $(KERNEL_TMP)$(ARCH)-%_a.o: arch/$(ARCH)/%.asm Makefile
 	@echo [ASM ] $<
 	@$(ASM) -Iarch/$(ARCH)/ -MD $(KERNEL_TMP)$(ARCH)-$*_a.d -MP $< -o $@
 $(KERNEL_TMP)$(ARCH)-%_c.o: arch/$(ARCH)/%.c Makefile
-	@echo [GCC ] $<
-	@$(CC) $(CFLAGS) -I./ -MD -MP $< -o $@
+	@echo "[CC  ] $<"
+	@$(CC) $(CFLAGS) -I. -MD -MP -c $< -o $@
 $(KERNEL_TMP)$(ARCH)-%_cpp.o: arch/$(ARCH)/%.cpp Makefile
-	@echo [CXX ] $<
-	@$(CXX) $(CXXFLAGS) -I. -MD -MP $< -o $@
+	@echo "[CXX ] $<"
+	@$(CXX) $(CXXFLAGS) -I. -MD -MP -c $< -o $@
 $(KERNEL_TMP)%_c.o: %.c Makefile
-	@echo [GCC ] $<
-	@$(CC) $(CFLAGS) -MD -MP $< -o $@
+	@echo "[CC  ] $<"
+	@$(CC) $(CFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)%_cpp.o: %.cpp Makefile
-	@echo [CXX ] $<
-	@$(CXX) $(CXXFLAGS) -MD -MP $< -o $@
+	@echo "[CXX ] $<"
+	@$(CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
 
 
 ##############################################################
@@ -107,7 +109,7 @@ install: kernel
 ##############################################################
 lint:
 	@echo "[LINT] $(notdir $(KERNEL_BIN))"
-	@cpplint $(CLINTFLAGS) $(KERNEL_C)
+	@cpplint $(CLINTFLAGS) $(KERNEL_C) $(KERNEL_ARCH_C)
 	@cpplint $(CPPLINTFLAGS) $(KERNEL_HEADER) $(KERNEL_CPP)
 
 ##############################################################

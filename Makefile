@@ -37,6 +37,7 @@ image-ls: image
 
 boot: image
 	@IMAGE_FILE="$(IMAGE_FILE)" make --no-print-directory -C src/boot install
+	@sync
 
 i686:
 	@IMAGE_FILE="$(IMAGE_FILE)" ARCH=i686 make --no-print-directory -C src/kernel install
@@ -46,6 +47,7 @@ i686:
 	fi
 	@mdel -i $(IMAGE_FILE)@@1M ::INITRD32.BIN > /dev/null 2>&1 || true
 	@mcopy -i $(IMAGE_FILE)@@1M dist/initrd32 ::INITRD32.BIN
+	@sync
 
 x86_64:
 	@IMAGE_FILE="$(IMAGE_FILE)" ARCH=x86_64 make --no-print-directory -C src/kernel install
@@ -55,6 +57,7 @@ x86_64:
 	fi
 	@mdel -i $(IMAGE_FILE)@@1M ::INITRD64.BIN > /dev/null 2>&1 || true
 	@mcopy -i $(IMAGE_FILE)@@1M dist/initrd64 ::INITRD64.BIN
+	@sync
 
 i686-run:
 	@echo "Starting qemu..."

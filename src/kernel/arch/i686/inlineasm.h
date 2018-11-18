@@ -30,7 +30,7 @@ static inline uint64_t _RDMSR(uint32_t msr) {
 static inline void _MOVCR3(uint32_t physcal_addr) {
     __asm volatile("mov cr3, %0" : : "r"(physcal_addr) : "memory");
 }
-static inline void _INVLPG(uint32_t addr) {
+static inline void _INVLPG(const void* addr) {
     __asm volatile("invlpg [%0]" : : "r"(addr) : "memory");
 }
 // -------------------------------------------------
