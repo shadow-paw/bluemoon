@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "kernel.h"
+#include "kaddr.h"
 #include "ioport.h"
 #include "kdebug.h"
 

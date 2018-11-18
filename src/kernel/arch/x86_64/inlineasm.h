@@ -12,6 +12,8 @@ static inline void _STI() { __asm volatile ("sti"); }
 static inline void _HLT() { __asm volatile ("hlt"); }
 
 // -------------------------------------------------
+// CPU Model Specific Register
+// -------------------------------------------------
 static inline void _WRMSR(uint32_t msr, uint64_t value) {
     __asm__ volatile ("wrmsr"
                       :
@@ -28,13 +30,14 @@ static inline uint64_t _RDMSR(uint32_t msr) {
 }
 
 // -------------------------------------------------
+// Paging
+// -------------------------------------------------
 static inline void _MOVCR3(uint64_t paddr) {
     __asm volatile("mov cr3, %0" : : "r"(paddr) : "memory");
 }
 static inline void _INVLPG(const void* addr) {
     __asm volatile("invlpg [%0]" : : "r"(addr) : "memory");
 }
-// -------------------------------------------------
 
 // -------------------------------------------------
 // SPINLOCK

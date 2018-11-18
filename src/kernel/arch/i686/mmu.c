@@ -10,13 +10,10 @@
 #define MMU_PD(addr)       ((uint32_t*)(KADDR_MMU_PD))
 #define MMU_PT(addr)       ((uint32_t*)((uintptr_t)KADDR_MMU_PT + ((((uintptr_t)(addr))>>10)&0x3FF000)))
 
-// PAGE TABLE FLAG
-#define MMU_PAGE_ONDEMAND    (0x0100)
-#define MMU_PAGE_MAPPHY      (0x0200)
-
 extern uint32_t k_PDT[];
 extern char _kernel_start, _kernel_end;
 
+// -------------------------------------------------
 uint32_t MMU_PHYPOOL_PT[1024] __attribute__((aligned(4096)));
 uint32_t MMU_PHYPOOL_FIRSTPAGE[1024] __attribute__((aligned(4096)));
 // we just store list of free page in an array
@@ -40,7 +37,7 @@ bool mmu_init(const BOOTDATA* boot) {
     k_PDT[MMU_PD_INDEX(KADDR_MMU_PHYPOOL)] = KADDR_PMA(MMU_PHYPOOL_PT) +3;
     MMU_PHYPOOL_PT[0] = KADDR_PMA(MMU_PHYPOOL_FIRSTPAGE) +3;
     for (int i = 1; i < 1024; i++) {
-        MMU_PHYPOOL_PT[i] = MMU_FLAG_ONDEMAND;
+        MMU_PHYPOOL_PT[i] = MMU_PAGE_ONDEMAND;
     }
     _MOVCR3(KADDR_PMA(k_PDT));
     // Build stack of available physical page
@@ -59,7 +56,7 @@ bool mmu_init(const BOOTDATA* boot) {
             // upon setting MMU_phypool[512] a page fault occur and demand allocated
             if (pt_index != (MMU_phypool_index >> 9)) {
                 pt_index = (MMU_phypool_index >> 9);
-                mmu_mark((const void*)&MMU_phypool[MMU_phypool_index], 0, MMU_FLAG_ONDEMAND);
+                mmu_mark((const void*)&MMU_phypool[MMU_phypool_index], 0, MMU_PAGE_ONDEMAND);
             }
             MMU_phypool[MMU_phypool_index] = (uint32_t) start;
             MMU_phypool_index++;
@@ -92,12 +89,12 @@ bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag) {
     uint32_t pt_index = MMU_PT_INDEX(addr);
     uint32_t* pd = MMU_PD(addr);
     uint32_t* pt = MMU_PT(addr);
-    if ((pd[pd_index] & (MMU_PROT_PRESENT|MMU_FLAG_ONDEMAND) ) == 0) {
-        pd[pd_index] = MMU_FLAG_ONDEMAND|MMU_PROT_RW|MMU_PROT_USER;
+    if ((pd[pd_index] & (MMU_PROT_PRESENT|MMU_PAGE_ONDEMAND)) == 0) {
+        pd[pd_index] = MMU_PAGE_ONDEMAND|MMU_PROT_RW|MMU_PROT_USER;
     }
     if ((pt[pt_index] & MMU_PROT_PRESENT) == 0) {
         if ((flag & MMU_PAGE_MAPPHY) == 0) {
-            pt[pt_index] = (uint32_t) (MMU_FLAG_ONDEMAND | (flag & MMU_PROT_MASK));
+            pt[pt_index] = (uint32_t) (MMU_PAGE_ONDEMAND | (flag & MMU_PROT_MASK));
         } else {
             pt[pt_index] = (uint32_t) (paddr | (flag & MMU_PROT_MASK) | MMU_PROT_PRESENT);
             _INVLPG(addr);
@@ -112,12 +109,8 @@ bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag) {
     } return true;
 }
 bool mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag) {
-    uint32_t pageflag = 0;
-    if (flag & MMU_MMAP_MAPPHY) {
-        pageflag |= MMU_PAGE_MAPPHY;
-    }
     for (size_t off = 0; off < size; off += 4096) {
-        if (!mmu_mark((const uint8_t*)mem + off, paddr+off, pageflag)) return false;
+        if (!mmu_mark((const uint8_t*)mem + off, paddr+off, flag)) return false;
     } return true;
 }
 bool mmu_munmap(const void* mem, size_t size, unsigned int flag) {
@@ -145,7 +138,7 @@ void INT_0E(uint32_t code, uint32_t addr, uint32_t ip) {
     //         "        : PD[%d] PT[%d]\n", ip, code, addr, MMU_PD_INDEX(addr), MMU_PT_INDEX(addr));
     pt = MMU_PT(addr);
     if ((code & 1) == 0) {  // Page Not Present
-        if ((pt[MMU_PT_INDEX(addr)] & MMU_FLAG_ONDEMAND) == 0) {
+        if ((pt[MMU_PT_INDEX(addr)] & MMU_PAGE_ONDEMAND) == 0) {
             kprintf("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
                     "        : PD[%d] PT[%d]\n", ip, code, addr, MMU_PD_INDEX(addr), MMU_PT_INDEX(addr));
             kprintf("    #PF : Access to unallocated memory.\n");

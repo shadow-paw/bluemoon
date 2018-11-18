@@ -6,14 +6,12 @@ bits 64
 
 
 global bootstrap, k_PML4T, k_PDPT, k_PDT
-extern kmain, IDT_init, _syscall_stub
+extern idt_init, kmain
 extern sbss, ebss, _kernel_end
 extern ctor_start, ctor_end, dtor_start, dtor_end
 
-
 %define IST_SIZE    (4096)
 %define KSTACK_SIZE (8192)
-
 
 section .bss
 ; ----------------------------------------------
@@ -26,14 +24,12 @@ kstack      resb    KSTACK_SIZE
 ist         resb    IST_SIZE*7
 tss         resb 104
 
-
 section .data
 ; ----------------------------------------------
 align 16
 gdtr    dw  8 *8 -1
         dq  gdt
         dw  0
-
 align 16
 gdt     dd  0, 0
         dd  0x0000FFFF, 0x00AF9A00              ; 0x08 CODE64 DPL0
@@ -42,7 +38,6 @@ gdt     dd  0, 0
         dd  0x0000FFFF, 0x008FF200              ; 0x20 DATA64 DPL3
         dd  0x0000FFFF, 0x00AFFA00              ; 0x28 CODE64 DPL3
         dd  0, 0, 0, 0                          ; 0x30 TSS
-
 
 section .text
 ; ----------------------------------------------
@@ -136,6 +131,8 @@ bootstrap:
     mov     dword [rdi+SEG_TSS+12], 0
     mov     eax, SEG_TSS
     ltr     ax
+    ; Setup IDT
+    call    idt_init
     ; Setup minimal C environment
     xor     ebp, ebp
     ; Constructors

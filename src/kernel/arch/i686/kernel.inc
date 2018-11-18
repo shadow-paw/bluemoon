@@ -1,5 +1,5 @@
-%ifndef __BLUEMOON_KERNEL__
-%define __BLUEMOON_KERNEL__
+%ifndef KERNEL_ARCH_I686_KERNEL_INC_
+%define KERNEL_ARCH_I686_KERNEL_INC_
 
 ; Address Translation used at early kernel stage
 ; ----------------------------------------------
@@ -61,7 +61,7 @@ endstruc
     %define _proc %1
     %assign _argc (%0-1)*4
     %rep %0 -1
-        %rotate -1 
+        %rotate -1
         push    %1
     %endrep
     call _proc
