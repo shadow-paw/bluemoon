@@ -1,3 +1,4 @@
+#include <string.h>
 #include "inlineasm.h"
 #include "kdebug.h"
 #include "mmu.h"
@@ -169,8 +170,7 @@ void INT_0E(uint64_t code, uint64_t addr, uint64_t ip) {
         prot = pt[MMU_PT_INDEX(addr)] & MMU_PROT_MASK;
         pt[MMU_PT_INDEX(addr)] = page | prot | MMU_PROT_PRESENT;
         _INVLPG((const void*)addr);
-        // TODO: clear allocated memory
-        // memset ((void*)((addr>>12)<<12), 0, 4096);
+        memset((void*)((addr >> 12) << 12), 0, 4096);
     } else {
         kprintf("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
                 "        : PML4[%d] PDPT[%d] PD[%d] PT[%d]\n", ip, code, addr,

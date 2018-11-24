@@ -1,3 +1,4 @@
+#include <string.h>
 #include "inlineasm.h"
 #include "kdebug.h"
 #include "mmu.h"
@@ -150,8 +151,7 @@ void INT_0E(uint32_t code, uint32_t addr, uint32_t ip) {
         prot = pt[MMU_PT_INDEX(addr)] & MMU_PROT_MASK;
         pt[MMU_PT_INDEX(addr)] = page | prot | MMU_PROT_PRESENT;
         _INVLPG((const void*)addr);
-        // TODO: clear allocated memory
-        // memset((void*)((addr >> 12) << 12), 0, 4096);
+        memset((void*)((addr >> 12) << 12), 0, 4096);
         if ((pd_index=MMU_PD_INDEX(addr)) >= 512) {
             uint32_t* pd = MMU_PD(addr);
             k_PDT[pd_index] = pd[pd_index];

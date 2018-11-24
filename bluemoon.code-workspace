@@ -13,6 +13,7 @@
 			"bin/": true,
 			"bluemoon.code-workspace": true,
 			"dist/": true,
+			"libc/": true,
 			"toolchain/": true
 		},
 		"files.trimTrailingWhitespace": true
