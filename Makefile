@@ -1,4 +1,4 @@
-.PHONY: all image image-delete image-ls boot i686 i686-run i686-debug i686-gdb x86_64 x86_64-run x86_64-debug x86_64-gdb lint clean
+.PHONY: all image image-delete image-ls boot i686 i686-run i686-debug i686-gdb x86_64 x86_64-run x86_64-debug x86_64-gdb lint test clean
 
 IMAGE_FILE=`pwd`/dist/bluemoon.img
 
@@ -22,7 +22,7 @@ all:
 	@echo "       make clean"
 
 image:
-	@IMAGE_FILE="$(IMAGE_FILE)" make --no-print-directory -C src/tools/mkosimage
+	@make --no-print-directory -C src/tools/mkosimage
 	@if [ ! -f "$(IMAGE_FILE)" ]; then \
 	  mkdir -p "$(dir $(IMAGE_FILE))" && \
 	  bin/mkosimage --file="$(IMAGE_FILE)" --size=10 && \
@@ -36,11 +36,13 @@ image-ls: image
 	@mdir -i $(IMAGE_FILE)@@1M ::
 
 boot: image
-	@IMAGE_FILE="$(IMAGE_FILE)" make --no-print-directory -C src/boot install
+	@make --no-print-directory -C src/boot install \
+	  IMAGE_FILE="$(IMAGE_FILE)"
 	@sync
 
 i686:
-	@IMAGE_FILE="$(IMAGE_FILE)" ARCH=i686 make --no-print-directory -C src/kernel install
+	@make --no-print-directory -C src/kernel install \
+	  IMAGE_FILE="$(IMAGE_FILE)" ARCH=i686 PLATFORM=pc
 # initrd, TODO: implement file packer
 	@if [ ! -f dist/initrd32 ]; then \
 	  dd if=/dev/zero of=dist/initrd32 bs=4k count=1 > /dev/null 2>&1; \
@@ -50,7 +52,8 @@ i686:
 	@sync
 
 x86_64:
-	@IMAGE_FILE="$(IMAGE_FILE)" ARCH=x86_64 make --no-print-directory -C src/kernel install
+	@make --no-print-directory -C src/kernel install \
+	  IMAGE_FILE="$(IMAGE_FILE)" ARCH=x86_64 PLATFORM=pc
 # initrd, TODO: implement file packer
 	@if [ ! -f dist/initrd64 ]; then \
 	  dd if=/dev/zero of=dist/initrd64 bs=4k count=1 > /dev/null 2>&1; \
@@ -59,26 +62,26 @@ x86_64:
 	@mcopy -i $(IMAGE_FILE)@@1M dist/initrd64 ::INITRD64.BIN
 	@sync
 
-i686-run:
+i686-run: i686
 	@echo "Starting qemu..."
 	@echo "[I] Press CTRL-A, then X to quit."
 	@echo "---------------------------------"
 	@-qemu-system-i386 $(QEMU_FLAGS) -drive format=raw,file="$(IMAGE_FILE)"
 
-x86_64-run:
+x86_64-run: x86_64
 	@echo "Starting qemu..."
 	@echo "[I] Press CTRL-A, then X to quit."
 	@echo "---------------------------------"
 	@-qemu-system-x86_64 $(QEMU_FLAGS) -drive format=raw,file="$(IMAGE_FILE)"
 
-i686-debug:
+i686-debug: i686
 	@echo "Starting qemu..."
 	@echo "[I] Press CTRL-A, then X to quit."
 	@echo "[I] Started in debug mode, run make debug-i686 on another terminal."
 	@echo "---------------------------------"
 	@-qemu-system-i386 -s $(QEMU_FLAGS) -drive format=raw,file="$(IMAGE_FILE)"
 
-x86_64-debug:
+x86_64-debug: x86_64
 	@echo "Starting qemu..."
 	@echo "[I] Press CTRL-A, then X to quit."
 	@echo "[I] Started in debug mode, run make debug-x86_64 on another terminal."
@@ -102,10 +105,20 @@ x86_64-gdb:
 	  --symbols=src/kernel/.build/x86_64/kernel64.sym
 
 lint:
-	@ARCH=i686 make --no-print-directory -C src/kernel lint
-	@ARCH=x86_64 make --no-print-directory -C src/kernel lint
+	@make --no-print-directory -C src/kernel lint \
+	  ARCH=i686 PLATFORM=pc
+	@make --no-print-directory -C src/kernel lint \
+	  ARCH=x86_64 PLATFORM=pc
+
+test:
+	@make --no-print-directory -C src/kernel test \
+	  ARCH=i686 PLATFORM=pc
+	@make --no-print-directory -C src/kernel test \
+	  ARCH=x86_64 PLATFORM=pc
 
 clean:
 	@-make --no-print-directory -C src/boot clean
-	@-ARCH=i686 make --no-print-directory -C src/kernel clean
-	@-ARCH=x86_64 make --no-print-directory -C src/kernel clean
+	@-make --no-print-directory -C src/kernel clean \
+	  ARCH=i686
+	@-make --no-print-directory -C src/kernel clean \
+	  ARCH=x86_64

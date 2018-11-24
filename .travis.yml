@@ -9,5 +9,6 @@ matrix:
         - pip install --user cpplint
       script:
         - make lint
+        - make test
 notifications:
   email: false
