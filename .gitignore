@@ -35,7 +35,10 @@
 
 # toolchain setup
 toolchain/
-!toolchain/*.sh
+
+# libc
+libc/
+
 
 .build/
 dist/

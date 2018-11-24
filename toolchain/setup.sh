@@ -23,7 +23,7 @@ Choose target architecture:
 2) Install toolchain for x86-64 target
 3) Install toolchain for ARM target
 4) Install toolchain for ARM64 target
-A) Install toolchain for all targets
+A) Install everything
 Q) Cancel
 EOM
     read -n 1 choice
@@ -31,46 +31,46 @@ EOM
     case $choice in
     1)
         detect_host
-        install_mtools
-        install_nasm
+        install_package  "mtools"
+        install_package  "nasm"
         install_binutils "i686-elf"
         install_gcc      "i686-elf"
         install_gdb      "i686-elf"
-        install_qemu
+        install_package  "qemu"
         post_install
         ;;
     2)
         detect_host
-        install_mtools
-        install_nasm
+        install_package  "mtools"
+        install_package  "nasm"
         install_binutils "x86_64-elf"
         install_gcc      "x86_64-elf"
         install_gdb      "x86_64-elf"
-        install_qemu
+        install_package  "qemu"
         post_install
         ;;
     3)
         detect_host
-        install_mtools
+        install_package mtools
         install_binutils "arm-none-eabi"
         install_gcc      "arm-none-eabi"
         install_gdb      "arm-none-eabi"
-        install_qemu
+        install_package  "qemu"
         post_install
         ;;
     4)
         detect_host
-        install_mtools
+        install_package  "mtools"
         install_binutils "aarch64-none-elf"
         install_gcc      "aarch64-none-elf"
         install_gdb      "aarch64-none-elf"
-        install_qemu
+        install_package  "qemu"
         post_install
         ;;
     A|a)
         detect_host
-        install_mtools
-        install_nasm
+        install_package  "mtools"
+        install_package  "nasm"
         install_binutils "i686-elf"
         install_gcc      "i686-elf"
         install_gdb      "i686-elf"
@@ -83,7 +83,7 @@ EOM
         install_binutils "aarch64-none-elf"
         install_gcc      "aarch64-none-elf"
         install_gdb      "aarch64-none-elf"
-        install_qemu
+        install_package  "qemu"
         post_install
         ;;
     esac
@@ -102,6 +102,7 @@ function detect_host {
         ;;
     *Linux* )
         HOST=linux
+        MAKE_J=`nproc`
         ;;
     *Darwin\ Kernel* )
         HOST=macosx
@@ -115,20 +116,22 @@ function detect_host {
         ;;
     esac
 }
-
-function install_nasm {
+function install_package {
+    local PACKAGE=$1
     case "${HOST}" in
     macosx )
-        echo "[ ] brew install nasm"
-        brew install nasm
+        echo "[ ] brew install ${PACKAGE}"
+        brew install ${PACKAGE}
         ;;
     linux )
-        echo "[ ] sudo apt-get install -y nasm"
-        sudo apt-get install -y nasm
+        INSTALLED=`dpkg --get-selections | grep -P "${PACKAGE}\t" | grep -P "\tinstall" | wc -l | tr -d '[:space:]'`
+        if [ "${INSTALLED}" = "0" ]; then
+            echo "[ ] sudo apt-get install -y ${PACKAGE}"
+            sudo apt-get install -y ${PACKAGE}
+        fi
         ;;
     esac
 }
-
 function install_binutils {
     local TARGET=$1
     local BINUTILS_FILE=${BINUTILS_URL##*/}
@@ -158,7 +161,6 @@ function install_binutils {
     )
     rm -rf "build-binutils-${TARGET}"
 }
-
 function install_gcc {
     local TARGET=$1
     local GCC_FILE=${GCC_URL##*/}
@@ -204,7 +206,6 @@ function install_gcc {
     )
     rm -rf "build-gcc-${TARGET}"
 }
-
 function install_gdb {
     local TARGET=$1
     local GDB_FILE=${GDB_URL##*/}
@@ -248,33 +249,6 @@ function install_gdb {
     )
     rm -rf "build-gdb-${TARGET}"
 }
-
-function install_mtools {
-    case "${HOST}" in
-    macosx )
-        echo "[ ] brew install mtools"
-        brew install mtools
-        ;;
-    linux )
-        echo "[ ] sudo apt-get install -y mtools"
-        sudo apt-get install -y mtools
-        ;;
-    esac
-}
-
-function install_qemu {
-    case "${HOST}" in
-    macosx )
-        echo "[ ] brew install qemu"
-        brew install qemu
-        ;;
-    linux )
-        echo "[ ] sudo apt-get install -y qemu"
-        sudo apt-get install -y qemu
-        ;;
-    esac
-}
-
 function post_install {
     cat << EOM
 Installation completed!

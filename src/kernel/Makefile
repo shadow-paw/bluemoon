@@ -11,16 +11,17 @@ else ifeq ($(ARCH),x86_64)
 else
   $(error "USAGE: IMAGE_FILE=xxx ARCH=i686|x86_64 make [install]")
 endif
-CC      :=$(ARCH)-elf-gcc
-CXX     :=$(ARCH)-elf-g++
-LD      :=$(ARCH)-elf-ld
-AR      :=$(ARCH)-elf-ar -rcs
-OBJCOPY :=$(ARCH)-elf-objcopy
-LIBGCC  :=$(shell $(CC) -print-libgcc-file-name 2>/dev/null)
+CC        :=$(ARCH)-elf-gcc
+CXX       :=$(ARCH)-elf-g++
+LD        :=$(ARCH)-elf-ld
+AR        :=$(ARCH)-elf-ar -rcs
+OBJCOPY   :=$(ARCH)-elf-objcopy
+LIBGCC    :=$(shell $(CC) -print-libgcc-file-name 2>/dev/null)
+LIBC_PATH :=../../libc/$(ARCH)-elf/
 
 # Compiler Flags
 ########################
-INCLUDE  =-Iarch/$(ARCH)
+INCLUDE  =-Iarch/$(ARCH) -I$(LIBC_PATH)include
 CWARN    =-Wall -Wextra -Wattributes -Wbuiltin-macro-redefined -Wcast-align -Wconversion         \
           -Wdiv-by-zero -Wdouble-promotion -Wenum-compare -Wfloat-equal -Winit-self              \
           -Wint-to-pointer-cast -Wlogical-op -Wmissing-braces -Wmissing-field-initializers       \
@@ -78,7 +79,9 @@ KERNEL_USELIB :=$(LIBGCC)
 kernel: $(KERNEL_BIN)
 $(KERNEL_BIN): $(KERNEL_TMP) $(KERNEL_OBJ) $(KERNEL_USELIB) Makefile
 	@echo "[LINK] $(notdir $@)"
-	@$(LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld -o $@ $(KERNEL_OBJ) $(KERNEL_USELIB)
+	@$(LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld \
+	  -o $@ $(KERNEL_OBJ) $(KERNEL_USELIB) \
+	  -L$(LIBC_PATH)lib -lc -lg -lm -lnosys
 	@$(OBJCOPY) --only-keep-debug $@ $(KERNEL_SYM)
 	@$(OBJCOPY) --strip-debug --strip-unneeded $@
 $(KERNEL_TMP):

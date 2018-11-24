@@ -17,6 +17,12 @@ To save all the trouble, you can run the auto installer:
 toolchain/setup.sh
 ```
 
+#### Prepare C runtime (newlib)
+To use the C library functions, we need an implementation of the C runtime, bluemoon uses [newlib](https://sourceware.org/newlib/).
+```
+libc/setup.sh
+```
+
 #### Prepare Test Image
 To run bluemoon on emulator, we need to create a virtual disk image.
 ```
