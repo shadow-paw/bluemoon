@@ -9,6 +9,8 @@
 			".gdb_history": true,
 			".vscode/": true,
 			"**/.build/": true,
+			"**/*.a": true,
+			"**/*.so": true,
 			"**/Makefile": true,
 			"bin/": true,
 			"bluemoon.code-workspace": true,
@@ -16,6 +18,9 @@
 			"libc/": true,
 			"toolchain/": true
 		},
-		"files.trimTrailingWhitespace": true
+		"files.trimTrailingWhitespace": true,
+		"files.associations": {
+			"xutility": "cpp"
+		}
 	}
 }

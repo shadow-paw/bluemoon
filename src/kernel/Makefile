@@ -16,17 +16,17 @@ ifndef PLATFORM
   $(error "USAGE: IMAGE_FILE=xxx ARCH=i686|x86_64 PLATFORM=pc make [install]")
 endif
 
-CC        :=$(ARCH)-elf-gcc
-CXX       :=$(ARCH)-elf-g++
-LD        :=$(ARCH)-elf-ld
-AR        :=$(ARCH)-elf-ar -rcs
-OBJCOPY   :=$(ARCH)-elf-objcopy
-LIBGCC    :=$(shell $(CC) -print-libgcc-file-name 2>/dev/null)
-LIBC_PATH :=../../libc/$(ARCH)-elf/
+CROSS_CC      :=$(ARCH)-elf-gcc
+CROSS_CXX     :=$(ARCH)-elf-g++
+CROSS_LD      :=$(ARCH)-elf-ld
+CROSS_AR      :=$(ARCH)-elf-ar -rcs
+CROSS_OBJCOPY :=$(ARCH)-elf-objcopy
+LIBGCC        :=$(shell $(CROSS_CC) -print-libgcc-file-name 2>/dev/null)
+LIBC_PATH     :=../../libc/$(ARCH)-elf/
 
 # Compiler Flags
 ########################
-INCLUDE  =-I$(LIBC_PATH)include -Iarch/$(ARCH)
+INCLUDE  =-I. -I$(LIBC_PATH)include -Iarch/$(ARCH) -I$(DRIVER_PATH)
 CWARN    =-Wall -Wextra -Wattributes -Wbuiltin-macro-redefined -Wcast-align -Wconversion         \
           -Wdiv-by-zero -Wdouble-promotion -Wenum-compare -Wfloat-equal -Winit-self              \
           -Wint-to-pointer-cast -Wlogical-op -Wmissing-braces -Wmissing-field-initializers       \
@@ -63,6 +63,19 @@ all: kernel
 
 ##############################################################
 #
+# KERNEL BUILTIN DRIVERS
+#
+##############################################################
+DRIVER_PATH      :=../driver/
+DRIVER_BUILTIN   :=serial
+DRIVER_BUILTIN_A :=$(wildcard $(addprefix $(DRIVER_PATH),$(addsuffix /*.a,$(DRIVER_BUILTIN))))
+builtin-drivers: $(DRIVER_BUILTIN)
+	@:
+$(DRIVER_BUILTIN): FORCE
+	@ARCH=$(ARCH) make --no-print-directory -C $(DRIVER_PATH)$@
+
+##############################################################
+#
 # KERNEL
 #
 ##############################################################
@@ -89,7 +102,10 @@ KERNEL_OBJ :=$(patsubst %.asm, $(KERNEL_TMP)%_a.o,   $(KERNEL_CORE_ASM)) \
 	     $(patsubst arch/$(ARCH)/%.cpp, $(KERNEL_TMP)$(ARCH)-%_cpp.o, $(KERNEL_ARCH_CPP)) \
              $(patsubst platform/$(PLATFORM)/%.asm, $(KERNEL_TMP)$(PLATFORM)-%_a.o,   $(KERNEL_PLATFORM_ASM)) \
 	     $(patsubst platform/$(PLATFORM)/%.c,   $(KERNEL_TMP)$(PLATFORM)-%_c.o,   $(KERNEL_PLATFORM_C))   \
-	     $(patsubst platform/$(PLATFORM)/%.cpp, $(KERNEL_TMP)$(PLATFORM)-%_cpp.o, $(KERNEL_PLATFORM_CPP))
+	     $(patsubst platform/$(PLATFORM)/%.cpp, $(KERNEL_TMP)$(PLATFORM)-%_cpp.o, $(KERNEL_PLATFORM_CPP)) \
+	     $(patsubst $(DRIVER_PATH)/%.cpp, $(KERNEL_TMP)driver-%_cpp.o, $(DRIVER_BUILTIN_CPP)) \
+	     $(patsubst $(DRIVER_PATH)/%.c, $(KERNEL_TMP)driver-%_c.o, $(DRIVER_BUILTIN_C))
+
 KERNEL_DEP    :=$(patsubst %.o,%.d,$(KERNEL_OBJ))
 KERNEL_BIN    :=$(KERNEL_TMP)$(KERNEL_FILE)
 KERNEL_SYM    :=$(KERNEL_BIN:.bin=.sym)
@@ -101,13 +117,15 @@ KERNEL_TEST_PROG :=$(patsubst test/%.cpp,$(KERNEL_TMP)%.test,$(KERNEL_TEST_CPP))
 -include $(KERNEL_DEP)
 
 kernel: $(KERNEL_BIN)
-$(KERNEL_BIN): $(KERNEL_TMP) $(KERNEL_OBJ) $(KERNEL_USELIB) Makefile
+$(KERNEL_BIN): $(KERNEL_TMP) $(KERNEL_OBJ) builtin-drivers Makefile
 	@echo "[LINK] $(notdir $@)"
-	@$(LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld \
-	  -o $@ $(KERNEL_OBJ) $(KERNEL_USELIB) \
+	@$(CROSS_LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld \
+	  -o $@ $(KERNEL_OBJ) \
+	  $(DRIVER_BUILTIN_A) \
+	  $(KERNEL_USELIB) \
 	  -L$(LIBC_PATH)lib -lc -lg -lm -lnosys
-	@$(OBJCOPY) --only-keep-debug $@ $(KERNEL_SYM)
-	@$(OBJCOPY) --strip-debug --strip-unneeded $@
+	@$(CROSS_OBJCOPY) --only-keep-debug $@ $(KERNEL_SYM)
+	@$(CROSS_OBJCOPY) --strip-debug --strip-unneeded $@
 $(KERNEL_TMP):
 	@mkdir -p $@
 $(KERNEL_TMP)%_a.o: %.asm Makefile
@@ -115,28 +133,34 @@ $(KERNEL_TMP)%_a.o: %.asm Makefile
 	@$(ASM) -MD $(KERNEL_TMP)-$*_a.d -MP $< -o $@
 $(KERNEL_TMP)%_c.o: %.c Makefile
 	@echo "[CC  ] $<"
-	@$(CC) $(CFLAGS) -MD -MP -c $< -o $@
+	@$(CROSS_CC) $(CFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)%_cpp.o: %.cpp Makefile
 	@echo "[CXX ] $<"
-	@$(CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
+	@$(CROSS_CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)$(ARCH)-%_a.o: arch/$(ARCH)/%.asm Makefile
 	@echo [ASM ] $<
 	@$(ASM) -Iarch/$(ARCH)/ -MD $(KERNEL_TMP)$(ARCH)-$*_a.d -MP $< -o $@
 $(KERNEL_TMP)$(ARCH)-%_c.o: arch/$(ARCH)/%.c Makefile
 	@echo "[CC  ] $<"
-	@$(CC) $(CFLAGS) -I. -MD -MP -c $< -o $@
+	@$(CROSS_CC) $(CFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)$(ARCH)-%_cpp.o: arch/$(ARCH)/%.cpp Makefile
 	@echo "[CXX ] $<"
-	@$(CXX) $(CXXFLAGS) -I. -MD -MP -c $< -o $@
+	@$(CROSS_CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)$(PLATFORM)-%_a.o: platform/$(PLATFORM)/%.asm Makefile
 	@echo [ASM ] $<
 	@$(ASM) -Iplatform/$(PLATFORM)/ -MD $(KERNEL_TMP)$(PLATFORM)-$*_a.d -MP $< -o $@
 $(KERNEL_TMP)$(PLATFORM)-%_c.o: platform/$(PLATFORM)/%.c Makefile
 	@echo "[CC  ] $<"
-	@$(CC) $(CFLAGS) -I. -MD -MP -c $< -o $@
+	@$(CROSS_CC) $(CFLAGS) -MD -MP -c $< -o $@
 $(KERNEL_TMP)$(PLATFORM)-%_cpp.o: platform/$(PLATFORM)/%.cpp Makefile
 	@echo "[CXX ] $<"
-	@$(CXX) $(CXXFLAGS) -I. -MD -MP -c $< -o $@
+	@$(CROSS_CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
+$(KERNEL_TMP)driver-%_c.o: $(DRIVER_PATH)%.c Makefile
+	@echo "[CC  ] $<"
+	@$(CROSS_CC) $(CFLAGS) -MD -MP -c $< -o $@
+$(KERNEL_TMP)driver-%_cpp.o: $(DRIVER_PATH)%.cpp Makefile
+	@echo "[CXX ] $<"
+	@$(CROSS_CXX) $(CXXFLAGS) -MD -MP -c $< -o $@
 
 
 ##############################################################
@@ -154,7 +178,7 @@ lint:
 
 $(KERNEL_TMP)%.test: test/%.cpp FORCE
 	@echo "[CXX ] $<"
-	@g++ -std=c++14 -O2 -lstdc++ -I. $< -o $@
+	@$(CXX) -std=c++14 -O2 -lstdc++ -I. $< -o $@
 
 test: $(KERNEL_TMP) $(KERNEL_TEST_PROG)
 	@rc=0; count=0; \

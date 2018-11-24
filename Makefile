@@ -107,7 +107,11 @@ x86_64-gdb:
 lint:
 	@make --no-print-directory -C src/kernel lint \
 	  ARCH=i686 PLATFORM=pc
+	@make --no-print-directory -C src/driver lint \
+	  ARCH=i686 PLATFORM=pc
 	@make --no-print-directory -C src/kernel lint \
+	  ARCH=x86_64 PLATFORM=pc
+	@make --no-print-directory -C src/driver lint \
 	  ARCH=x86_64 PLATFORM=pc
 
 test:
@@ -119,6 +123,10 @@ test:
 clean:
 	@-make --no-print-directory -C src/boot clean
 	@-make --no-print-directory -C src/kernel clean \
+	  ARCH=i686 PLATFORM=pc
+	@-make --no-print-directory -C src/driver clean \
 	  ARCH=i686
 	@-make --no-print-directory -C src/kernel clean \
+	  ARCH=x86_64 PLATFORM=pc
+	@-make --no-print-directory -C src/driver clean \
 	  ARCH=x86_64

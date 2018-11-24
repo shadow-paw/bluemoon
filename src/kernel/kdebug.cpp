@@ -6,68 +6,12 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "kaddr.h"
-#include "ioport.h"
+#include "hal.h"
 #include "kdebug.h"
 
-/**
- * Serial output
- */
-#define PORT 0x3f8   /* COM1 */
-void serial_init() {
-    static bool serial_initialized = false;
-    if (serial_initialized) return;
-    outb(PORT + 1, 0x00);    // Disable all interrupts
-    outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-    outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-    outb(PORT + 1, 0x00);    //                  (hi byte)
-    outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
-    outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-    outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
-    serial_initialized = true;
-}
-int serial_is_transmit_empty() {
-    return inb(PORT + 5) & 0x20;
-}
-void serial_putc(int c) {
-    serial_init();
-    while (serial_is_transmit_empty() == 0) {}
-    outb(PORT, (uint8_t)c);
-}
-
-/**
- * VGA text output
- */
-int cur_x = 0, cur_y = 0;
-void vga_putc(int c) {
-    volatile unsigned char* video = (volatile unsigned char*) (KADDR_ZERO_VMA + 0xB8000);
-    // scroll screen
-    if (cur_y >= 25) {
-        for (int i=0; i < 24*80*2; i++) {
-            video[i] = video[i+160];
-        }
-        for (int i=0; i < 160; i++) {
-            video[24*80*2 + i] = 0;
-        }
-        cur_y = 24;
-    }
-    if (c == '\r' || c == '\n') {
-        cur_x = 80;
-    } else {
-        video[cur_y*160+cur_x*2  ] = (unsigned char) c;
-        video[cur_y*160+cur_x*2+1] = 0x07;
-    }
-    if ((++cur_x) >= 80) {
-        cur_x = 0;
-        cur_y++;
-    }
-}
-// -------------------------------------------------
-// High level print functions
-// -------------------------------------------------
+namespace kernel {
 void kputc(int c) {
-    serial_putc(c);
-    vga_putc(c);
+    HAL::inst()->serial_putc(0, c);
 }
 void kputs(const char * s) {
     for (; *s; s++) kputc(*s);
@@ -105,7 +49,7 @@ void dec2asc(uint64_t num, char* des) {
     }
     *des = 0;
 }
-void kprintf(const char* fmt, ...) {
+extern "C" void kdebug(const char* fmt, ...) {
     char buf[32];
     const char* p;
     char c;
@@ -167,3 +111,4 @@ void kprintf(const char* fmt, ...) {
     }
     va_end(va);
 }
+}  // namespace kernel
