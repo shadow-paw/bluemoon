@@ -121,7 +121,7 @@ bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint64_t flag) {
         if ((flag & MMU_PAGE_MAPPHY) == 0) {
             pt[pt_index] = (pt[pt_index] & (~(uint64_t)MMU_PROT_MASK)) | ((uint64_t)flag & MMU_PROT_MASK) | MMU_PROT_PRESENT;
         } else {
-            kprintf("    MMU : map fail, addr:%X paddr:%X flag=%d entry:%X\n", addr, paddr, flag, pt[pt_index]);
+            kdebug("    MMU : map fail, addr:%X paddr:%X flag=%d entry:%X\n", addr, paddr, flag, pt[pt_index]);
             return false;
         }
     } return true;
@@ -158,11 +158,11 @@ void INT_0E(uint64_t code, uint64_t addr, uint64_t ip) {
     pt = MMU_PT(addr);
     if ((code & 1) == 0) {  // Page Not Present
         if ((pt[MMU_PT_INDEX(addr)] & MMU_PAGE_ONDEMAND) == 0) {
-            kprintf("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
-                    "        : PML4[%d] PDPT[%d] PD[%d] PT[%d]\n", ip, code, addr,
-                    MMU_PML4_INDEX(addr), MMU_PDPT_INDEX(addr), MMU_PD_INDEX(addr), MMU_PT_INDEX(addr) );
-            kprintf("    #PF : Access to unallocated memory. CODE: %d\n", code);
-            kprintf("        : ADDR: %X PT[%d]: %X\n", addr, MMU_PT_INDEX(addr), pt[MMU_PT_INDEX(addr)]);
+            kdebug("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
+                   "        : PML4[%d] PDPT[%d] PD[%d] PT[%d]\n", ip, code, addr,
+                   MMU_PML4_INDEX(addr), MMU_PDPT_INDEX(addr), MMU_PD_INDEX(addr), MMU_PT_INDEX(addr) );
+            kdebug("    #PF : Access to unallocated memory. CODE: %d\n", code);
+            kdebug("        : ADDR: %X PT[%d]: %X\n", addr, MMU_PT_INDEX(addr), pt[MMU_PT_INDEX(addr)]);
             __asm volatile ("cli; hlt");
         }
         page = mmu_alloc();
@@ -172,11 +172,11 @@ void INT_0E(uint64_t code, uint64_t addr, uint64_t ip) {
         _INVLPG((const void*)addr);
         memset((void*)((addr >> 12) << 12), 0, 4096);
     } else {
-        kprintf("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
-                "        : PML4[%d] PDPT[%d] PD[%d] PT[%d]\n", ip, code, addr,
-                MMU_PML4_INDEX(addr), MMU_PDPT_INDEX(addr), MMU_PD_INDEX(addr), MMU_PT_INDEX(addr) );
-        kprintf("      #PF : Access to protected memory. CODE: %d\n", code);
-        kprintf("          : ADDR: %X PTE[%d]: %X\n", addr, MMU_PT_INDEX(addr), pt[MMU_PT_INDEX(addr)]);
+        kdebug("  INT0E : #PF Page Fault Exception. IP:%X CODE:%d ADDR:%X\n"
+               "        : PML4[%d] PDPT[%d] PD[%d] PT[%d]\n", ip, code, addr,
+               MMU_PML4_INDEX(addr), MMU_PDPT_INDEX(addr), MMU_PD_INDEX(addr), MMU_PT_INDEX(addr) );
+        kdebug("      #PF : Access to protected memory. CODE: %d\n", code);
+        kdebug("          : ADDR: %X PTE[%d]: %X\n", addr, MMU_PT_INDEX(addr), pt[MMU_PT_INDEX(addr)]);
         __asm volatile ("cli; hlt");
     }
     // kprintf ("INT0E : EXIT. CODE:%d ADDR:%X\n", code, addr);

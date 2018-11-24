@@ -43,16 +43,16 @@ typedef struct {
 // -------------------------------------------------
 _SPINLOCK __kernel_heap_lock;
 HEAP __kernel_heap = {
-    (size_t)((char*)&_kernel_end) + 4096,
-    0,
-    1024*1024*192,
-    0
+    .start = (size_t)((char*)&_kernel_end) + 4096,
+    .ptr = 0,
+    .size = 1024*1024*192, // max heap size 192MB
+    .flag = 0
 };
 // -------------------------------------------------
-KMALLOC_FREELIST __kmalloc_64    = {0, {0, 0}};
-KMALLOC_FREELIST __kmalloc_512   = {0, {0, 0}};
-KMALLOC_FREELIST __kmalloc_1024  = {0, {0, 0}};
-KMALLOC_FREELIST __kmalloc_large = {0, {0, 0}};
+KMALLOC_FREELIST __kmalloc_64    = { .lock = 0, .node = { .next = 0, .size = 0} };
+KMALLOC_FREELIST __kmalloc_512   = { .lock = 0, .node = { .next = 0, .size = 0} };
+KMALLOC_FREELIST __kmalloc_1024  = { .lock = 0, .node = { .next = 0, .size = 0} };
+KMALLOC_FREELIST __kmalloc_large = { .lock = 0, .node = { .next = 0, .size = 0} };
 // -------------------------------------------------
 void* kmalloc(size_t size) {
     KMALLOC_FREELIST *list;
@@ -74,14 +74,14 @@ void* kmalloc(size_t size) {
 
     _INT_DISABLE();
     _SPIN_LOCK(&list->lock);
-    if ( size <= 1024 ) {
-        if ( (node=list->node.next) != 0 ) {
+    if (size <= 1024) {
+        if ((node=list->node.next) != 0) {
             list->node.next = node->next;
         }
      } else {
-        for ( parent=&list->node; ; parent=node ) {
-            if ( (node=parent->next) == 0 ) break;
-            if ( node->size >= size ) {
+        for (parent=&list->node; ; parent=node) {
+            if ((node=parent->next) == 0) break;
+            if (node->size >= size) {
                 parent->next = node->next;
                 break;
             }
@@ -116,6 +116,7 @@ void kfree(void* ptr) {
     } else {
         list = &__kmalloc_large;
     }
+
     _INT_DISABLE();
     _SPIN_LOCK(&list->lock);
     node->next = list->node.next;

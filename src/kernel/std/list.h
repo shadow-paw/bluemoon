@@ -30,11 +30,14 @@ class list : protected NonCopyable<list<T>> {
      public:
         iterator() = delete;
         iterator(list<T>* cls, node* n) : _cls(cls), _node(n) {}
+        explicit operator T() const { return _node->data; }
+        explicit operator T*() const { return &_node->data; }
         T& operator *() { return _node->data; }
         iterator next() const { return iterator(_cls, _node->next); }
         void operator ++() { _node = _node->next; }
         bool operator ==(const iterator& rhs) const { return _cls == rhs._cls && _node == rhs._node; }
         bool operator !=(const iterator& rhs) const { return _cls != rhs._cls || _node != rhs._node; }
+        T* operator ->() { return &_node->data; }
      private:
         list<T>* _cls;
         node* _node;
@@ -44,11 +47,14 @@ class list : protected NonCopyable<list<T>> {
      public:
         const_iterator() = delete;
         const_iterator(const list<T>* cls, const node* n) : _cls(cls), _node(n) {}
+        explicit operator T() const { return _node->data; }
+        explicit operator const T*() const { return &_node->data; }
         const T& operator *() const { return _node->data; }
         const_iterator next() const { return const_iterator(_cls, _node->next); }
         void operator ++() { _node = _node->next; }
         bool operator ==(const const_iterator& rhs) const { return _cls == rhs._cls && _node == rhs._node; }
         bool operator !=(const const_iterator& rhs) const { return _cls != rhs._cls || _node != rhs._node; }
+        const T* operator ->() const { return &_node->data; }
      private:
         const list<T>* _cls;
         const node* _node;

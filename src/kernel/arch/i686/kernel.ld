@@ -9,13 +9,13 @@ SECTIONS
     _kernel_start = .;
     . = ALIGN(4096);
 
-    .text BLOCK(4096) :
+    .text BLOCK(4096) : ALIGN(4K)
     {
         *bootstrap*(.text)
         *(.text)
         *(.gnu.linkonce.t*)
     }
-    .rodata BLOCK(4096) :
+    .rodata BLOCK(4096) : ALIGN(4K)
     {
         ctor_start = .;
        *(SORT(.ctors*))
@@ -27,12 +27,12 @@ SECTIONS
         *(.rodata*)
         *(.gnu.linkonce.r*)
     }
-    .data BLOCK(4096) :
+    .data BLOCK(4096) : ALIGN(4K)
     {
         *(.data)
         *(.gnu.linkonce.d*)
     }
-    .bss BLOCK(4096) :
+    .bss BLOCK(4096) : ALIGN(4K)
     {
         sbss = .;
         *(.bss)

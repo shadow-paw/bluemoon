@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 // -------------------------------------------------
-    void kprintf(const char* fmt, ...);
+    void kdebug(const char* fmt, ...);
 // -------------------------------------------------
 #ifdef __cplusplus
 };
