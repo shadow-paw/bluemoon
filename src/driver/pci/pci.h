@@ -1,5 +1,5 @@
-#ifndef DRIVER_SERIAL_SERIAL_H_
-#define DRIVER_SERIAL_SERIAL_H_
+#ifndef DRIVER_PCI_PCI_H_
+#define DRIVER_PCI_PCI_H_
 
 #include "ddk/driver.h"
 
@@ -7,10 +7,10 @@
 extern "C" {
 #endif
 // -------------------------------------------------
-    DRIVER* driver_serial();
+    DRIVER* driver_pci();
 // -------------------------------------------------
 #ifdef __cplusplus
 };
 #endif
 
-#endif  // DRIVER_SERIAL_SERIAL_H_
+#endif  // DRIVER_PCI_PCI_H_

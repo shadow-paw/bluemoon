@@ -16,6 +16,7 @@ void test_kmalloc() {
     delete foo;
 }
 void main2() {
+    kernel::HAL::inst()->load_builtin_drivers();
     kernel::HAL::inst()->detect();
     _STI();
     kdebug("Hello kernel!\n");

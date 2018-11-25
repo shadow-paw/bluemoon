@@ -1,3 +1,7 @@
+# List of builtin drivers static linked with kernel
+DRIVER_BUILTIN =serial pci
+
+
 .PHONY: all kernel install lint test clean
 
 # Tools
@@ -42,11 +46,11 @@ CXXWARN  =-Wall -Wextra -Wattributes -Wbuiltin-macro-redefined -Wcast-align -Wco
           -Wtype-limits -Wuninitialized -Wwrite-strings                                          \
           -Wno-unused-parameter -Wno-unused-variable -Wno-multichar -Wno-unused-but-set-variable \
           -Wc++0x-compat  -Wsign-promo
-CFLAGS   =-fPIC -ffreestanding -masm=intel -std=c99 -O2 \
+CFLAGS   =-fPIC -ffreestanding -masm=intel -std=c11 -O2 \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
           $(INCLUDE) -Werror $(CWARN) \
           -DARCH=$(ARCH) -DPLATFORM=$(PLATFORM)
-CXXFLAGS =-fPIC -ffreestanding -masm=intel -std=c++14 -O2 \
+CXXFLAGS =-fPIC -ffreestanding -masm=intel -std=c++17 -O2 \
           -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
           -fno-exceptions -fno-rtti -fno-stack-protector \
           $(INCLUDE) -Werror $(CXXWARN) \
@@ -67,7 +71,6 @@ all: kernel
 #
 ##############################################################
 DRIVER_PATH      :=../driver/
-DRIVER_BUILTIN   :=serial
 DRIVER_BUILTIN_A :=$(wildcard $(addprefix $(DRIVER_PATH),$(addsuffix /*.a,$(DRIVER_BUILTIN))))
 builtin-drivers: $(DRIVER_BUILTIN)
 	@:

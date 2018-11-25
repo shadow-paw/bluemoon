@@ -8,10 +8,9 @@
 struct DRIVER_BUS_;
 struct HAL_BUS_;
 typedef struct {
-    struct HAL_BUS_* bus;
-    unsigned int     bus_id;
-    unsigned int     slot_id;
-    unsigned int     func_id;
+    unsigned int bus_id;
+    unsigned int slot_id;
+    unsigned int func_id;
 } HAL_BUS_ADDR;
 typedef struct {
     unsigned int device_id;
@@ -30,7 +29,7 @@ typedef struct DRIVER_BUS_ {
     int (*command)(struct HAL_BUS_* bus, const HAL_BUS_ADDR* addr, uint16_t cmd);
 } DRIVER_BUS;
 typedef struct HAL_BUS_ {
-    struct DRIVER_BUS_* bus_driver;
+    struct DRIVER_BUS_* driver;
 } HAL_BUS;
 
 #endif  // KERNEL_DDK_BUS_H_

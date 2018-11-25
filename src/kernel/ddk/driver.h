@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-enum {
+enum DriverType {
     DriverTypeNull    = 'null',
     DriverTypeBus     = 'bus',
     DriverTypeSerial  = 'com ',
@@ -12,11 +12,11 @@ enum {
     DriverTypeDisplay = 'disp',
     DriverTypeNIC     = 'nic '
 };
+
 typedef struct DRIVER_ {
     uint32_t type;
     uint32_t id;
-    int (*init)(struct DRIVER_* driver);
-    int (*fini)(struct DRIVER_* driver);
+    uint32_t ref;
 } DRIVER;
 
 #endif  // KERNEL_DDK_DRIVER_H_

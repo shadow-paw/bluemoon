@@ -9,10 +9,10 @@ struct HAL_SERIAL_;
 // -------------------------------------------------
 typedef struct DRIVER_SERIAL_ {
     DRIVER base;
-    int (*open)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial, unsigned int index);
-    int (*close)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial);
+    int  (*open)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial, unsigned int index);
+    int  (*close)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial);
     void (*putc)(struct HAL_SERIAL_* serial, int c);
-    int (*getc)(struct HAL_SERIAL_* serial);
+    int  (*getc)(struct HAL_SERIAL_* serial);
 } DRIVER_SERIAL;
 typedef struct HAL_SERIAL_ {
     DRIVER_SERIAL* driver;
