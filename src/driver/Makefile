@@ -1,15 +1,19 @@
-.PHONY: all drivers lint clean
+.PHONY: all lint clean
 
 DRIVERS :=$(sort $(wildcard */))
 
-all: drivers
+
+all: $(DRIVERS)
 	@:
 
-drivers: $(DRIVERS)
-	@make -C $<
-
 lint: $(DRIVERS)
-	@make -C $< lint
+	@:
 
 clean: $(DRIVERS)
-	@-make -C $< clean
+	@:
+
+$(DRIVERS): FORCE
+	@make --no-print-directory -C $@ $(MAKECMDGOALS)
+
+FORCE:
+

@@ -1,4 +1,7 @@
-.PHONY: all image image-delete image-ls boot i686 i686-run i686-debug i686-gdb x86_64 x86_64-run x86_64-debug x86_64-gdb lint test clean
+.PHONY: all image image-delete image-ls boot \
+	i686 i686-kernel i686-drivers i686-initrd i686-run i686-debug i686-gdb \
+	x86_64 x86_64-kernel x86_64-drivers x86_64-initrd x86_64-run x86_64-debug x86_64-gdb \
+	lint test clean
 
 IMAGE_FILE=`pwd`/dist/bluemoon.img
 
@@ -38,29 +41,44 @@ image-ls: image
 boot: image
 	@make --no-print-directory -C src/boot install \
 	  IMAGE_FILE="$(IMAGE_FILE)"
-	@sync
 
-i686:
+i686-kernel:
 	@make --no-print-directory -C src/kernel install \
 	  IMAGE_FILE="$(IMAGE_FILE)" ARCH=i686 PLATFORM=pc
+
+i686-drivers:
+	@make --no-print-directory -C src/driver \
+	  ARCH=i686
+
+i686-initrd: i686-drivers
 # initrd, TODO: implement file packer
 	@if [ ! -f dist/initrd32 ]; then \
 	  dd if=/dev/zero of=dist/initrd32 bs=4k count=1 > /dev/null 2>&1; \
 	fi
 	@mdel -i $(IMAGE_FILE)@@1M ::INITRD32.BIN > /dev/null 2>&1 || true
 	@mcopy -i $(IMAGE_FILE)@@1M dist/initrd32 ::INITRD32.BIN
-	@sync
 
-x86_64:
+i686: i686-kernel i686-initrd
+	@:
+
+x86_64-kernel:
 	@make --no-print-directory -C src/kernel install \
 	  IMAGE_FILE="$(IMAGE_FILE)" ARCH=x86_64 PLATFORM=pc
+
+x86_64-drivers:
+	@make --no-print-directory -C src/driver \
+	  ARCH=x86_64
+
+x86_64-initrd: x86_64-drivers
 # initrd, TODO: implement file packer
 	@if [ ! -f dist/initrd64 ]; then \
 	  dd if=/dev/zero of=dist/initrd64 bs=4k count=1 > /dev/null 2>&1; \
 	fi
 	@mdel -i $(IMAGE_FILE)@@1M ::INITRD64.BIN > /dev/null 2>&1 || true
 	@mcopy -i $(IMAGE_FILE)@@1M dist/initrd64 ::INITRD64.BIN
-	@sync
+
+x86_64: x86_64-kernel x86_64-initrd
+	@:
 
 i686-run: i686
 	@echo "Starting qemu..."

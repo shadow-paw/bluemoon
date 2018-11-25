@@ -1,6 +1,3 @@
-// builtin drivers
-#include "serial/serial.h"
-//
 #include "hal.h"
 
 namespace kernel {
@@ -12,12 +9,6 @@ HAL* HAL::inst() {
 }
 
 HAL::HAL() {
-    // NOTE: modify kernel/Makefile to add builtin drivers
-    {  // builtin: serial
-        auto driver = get_driver_serial();
-        driver->init(driver);
-        _drivers.push_front(driver);
-    }
 }
 HAL::~HAL() {
 }

@@ -14,23 +14,42 @@ class HAL {
     HAL();
     ~HAL();
 
-    static HAL* inst();
     // NOTE: this should be implemented per platform
+    void load_builtin_drivers();
     bool detect();
 
-// serial functions
+// -------------------------------------------------
+// singleton
+// -------------------------------------------------
  public:
-    void serial_putc(unsigned int index, int c);
-    int serial_getc(unsigned int index);
- private:
-    list<HAL_SERIAL> _serials;
-
- private:
-    list<DRIVER*> _drivers;
-    DRIVER* find_driver(uint32_t type, uint32_t id);
+    static HAL* inst();
 
  private:
     static HAL* _inst;
+// -------------------------------------------------
+// serial functions
+// -------------------------------------------------
+ public:
+    /// write character to serial port
+    /// @param index port index, 0: COM1, 1: COM2, 2: COM3, 3: COM4
+    /// @param c character to output
+    void serial_putc(unsigned int index, int c);
+    /// read character from serial port
+    /// @param index port index, 0: COM1, 1: COM2, 2: COM3, 3: COM4
+    /// @return character read from input, 0 if failed.
+    int  serial_getc(unsigned int index);
+
+ private:
+    // devices
+    list<HAL_SERIAL> _serials;
+    list<HAL_BUS>    _buses;
+
+// -------------------------------------------------
+// loaded drivers
+// -------------------------------------------------
+ private:
+    list<DRIVER*> _drivers;
+    DRIVER* find_driver(uint32_t type, uint32_t id);
 };
 }  // namespace kernel
 // -------------------------------------------------
