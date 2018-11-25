@@ -125,12 +125,10 @@ x86_64-gdb:
 lint:
 	@make --no-print-directory -C src/kernel lint \
 	  ARCH=i686 PLATFORM=pc
-	@make --no-print-directory -C src/driver lint \
-	  ARCH=i686 PLATFORM=pc
 	@make --no-print-directory -C src/kernel lint \
 	  ARCH=x86_64 PLATFORM=pc
 	@make --no-print-directory -C src/driver lint \
-	  ARCH=x86_64 PLATFORM=pc
+	  ARCH=i686 PLATFORM=pc
 
 test:
 	@make --no-print-directory -C src/kernel test \

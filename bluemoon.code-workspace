@@ -20,7 +20,6 @@
 		},
 		"files.trimTrailingWhitespace": true,
 		"files.associations": {
-			"xutility": "cpp"
 		}
 	}
 }

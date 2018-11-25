@@ -27,6 +27,7 @@ bool HAL::detect() {
         for (unsigned int bus_id = 0; bus_id < 256; bus_id++) {
             for (unsigned int slot_id = 0; slot_id < 32; slot_id++) {
                 for (unsigned int func_id = 0; func_id < 8; func_id++) {
+                    addr.bus = &bus;
                     addr.bus_id  = bus_id;
                     addr.slot_id = slot_id;
                     addr.func_id = func_id;

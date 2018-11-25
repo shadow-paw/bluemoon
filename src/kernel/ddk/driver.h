@@ -13,7 +13,7 @@ enum DriverType {
     DriverTypeNIC     = 'nic '
 };
 
-typedef struct DRIVER_ {
+typedef struct HAL_DRIVER_ {
     uint32_t type;
     uint32_t id;
     uint32_t ref;

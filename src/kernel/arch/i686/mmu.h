@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 #include "kaddr.h"
 #include "../../bootdata.h"
 
@@ -26,11 +25,11 @@ typedef uint32_t MMU_PHYADDR;
 extern "C" {
 #endif
 // -------------------------------------------------
-    bool        mmu_init(const BOOTDATA* boot);
+    int         mmu_init(const BOOTDATA* boot);
     MMU_PHYADDR mmu_alloc(void);
     void        mmu_free(MMU_PHYADDR addr);
-    bool        mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag);
-    bool        mmu_munmap(const void* mem, size_t size, unsigned int flag);
+    int         mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag);
+    int         mmu_munmap(const void* mem, size_t size, unsigned int flag);
 // -------------------------------------------------
 #ifdef __cplusplus
 };
