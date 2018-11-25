@@ -68,7 +68,7 @@ driver: $(DRIVER_A)
 # $(DRIVER_SO)
 $(DRIVER_A): $(DRIVER_TMP) $(DRIVER_OBJ) Makefile
 	@echo "[LINK] $(notdir $@)"
-	@$(CROSS_AR) -o $@ $(DRIVER_OBJ)
+	@$(CROSS_AR) $@ $(DRIVER_OBJ)
 $(DRIVER_TMP):
 	@mkdir -p $@
 $(DRIVER_TMP)%_c.o: %.c Makefile

@@ -1,7 +1,7 @@
 #include "ddk/ddk.h"
 #include "serial.h"
 
-int driver_serial_open(DRIVER_SERIAL* driver, HAL_SERIAL* serial, unsigned int index) {
+int driver_serial_open(DRIVER_SERIAL* driver, HAL_SERIAL* serial, uint32_t index) {
     uint16_t ioport[] = { 0x03F8, 0x02F8, 0x03E8, 0x02E8 };
     if (index >= sizeof(ioport) / sizeof(ioport[0])) return -1;
     if (!driver || !serial) return -1;

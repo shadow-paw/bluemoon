@@ -1,8 +1,8 @@
 #include "ddk/ddk.h"
 #include "pci.h"
 
-#define PCI_CONFIG_ADDRESS (0xCF8)
-#define PCI_CONFIG_DATA    (0xCFC)
+#define PCI_CONFIG_ADDRESS (0x0CF8)
+#define PCI_CONFIG_DATA    (0x0CFC)
 
 uint32_t pci_address(const HAL_BUS_ADDR* addr) {
     if (!addr || addr->bus_id >= 256 || addr->slot_id >= 32 || addr->func_id >= 8) return 0;

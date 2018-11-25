@@ -5,19 +5,19 @@
 #include <stddef.h>
 #include "driver.h"
 
-struct HAL_SERIAL_;
-// -------------------------------------------------
-typedef struct DRIVER_SERIAL_ {
-    DRIVER base;
-    int  (*open)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial, unsigned int index);
-    int  (*close)(struct DRIVER_SERIAL_* driver, struct HAL_SERIAL_* serial);
-    void (*putc)(struct HAL_SERIAL_* serial, int c);
-    int  (*getc)(struct HAL_SERIAL_* serial);
-} DRIVER_SERIAL;
-typedef struct HAL_SERIAL_ {
-    DRIVER_SERIAL* driver;
-    unsigned int index;
+struct DRIVER_SERIAL_;
+typedef struct {
+    struct DRIVER_SERIAL_* driver;
+    uint32_t index;
     uint16_t ioport;
 } HAL_SERIAL;
+
+typedef struct DRIVER_SERIAL_ {
+    DRIVER base;
+    int  (*open)(struct DRIVER_SERIAL_* driver, HAL_SERIAL* serial, uint32_t index);
+    int  (*close)(struct DRIVER_SERIAL_* driver, HAL_SERIAL* serial);
+    void (*putc)(HAL_SERIAL* serial, int c);
+    int  (*getc)(HAL_SERIAL* serial);
+} DRIVER_SERIAL;
 
 #endif  // KERNEL_DDK_SERIAL_H_

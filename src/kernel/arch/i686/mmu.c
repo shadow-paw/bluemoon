@@ -23,9 +23,9 @@ volatile MMU_PHYADDR* MMU_phypool = (MMU_PHYADDR*)KADDR_MMU_PHYPOOL;
 volatile unsigned int MMU_phypool_index = 0;  // index for next allocation
 
 // NOTE: implemented below
-bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag);
+int mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag);
 // -------------------------------------------------
-bool mmu_init(const BOOTDATA* boot) {
+int mmu_init(const BOOTDATA* boot) {
     const BIOSMEMORYMAP* map = boot->biosmm;
     uint64_t kend = (KADDR_PMA((uintptr_t)&_kernel_end)) + 4096;
     uint64_t initrd_start = (uint64_t) boot->initrd_addr;
@@ -63,7 +63,7 @@ bool mmu_init(const BOOTDATA* boot) {
             MMU_phypool_index++;
         }
     }
-    return true;
+    return 0;
 }
 MMU_PHYADDR mmu_alloc(void) {
     MMU_PHYADDR addr = 0;
@@ -85,7 +85,7 @@ void mmu_free(MMU_PHYADDR addr) {
     _SPIN_UNLOCK(&MMU_lock);
     _INT_RESTORE();
 }
-bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag) {
+int mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag) {
     uint32_t pd_index = MMU_PD_INDEX(addr);
     uint32_t pt_index = MMU_PT_INDEX(addr);
     uint32_t* pd = MMU_PD(addr);
@@ -105,16 +105,16 @@ bool mmu_mark(const void* addr, MMU_PHYADDR paddr, uint32_t flag) {
             pt[pt_index] = (pt[pt_index] & (~(uint32_t)MMU_PROT_MASK)) | ((uint32_t)flag & MMU_PROT_MASK);
         } else {
             kdebug("    MMU : map fail, addr:%X paddr:%X flag=%d entry:%X\n", addr, paddr, flag, pt[pt_index]);
-            return false;
+            return -1;
         }
-    } return true;
+    } return 0;
 }
-bool mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag) {
+int mmu_mmap(const void* mem, MMU_PHYADDR paddr, size_t size, unsigned int flag) {
     for (size_t off = 0; off < size; off += 4096) {
-        if (!mmu_mark((const uint8_t*)mem + off, paddr+off, flag)) return false;
-    } return true;
+        if (mmu_mark((const uint8_t*)mem + off, paddr+off, flag) != 0) return -1;
+    } return 0;
 }
-bool mmu_munmap(const void* mem, size_t size, unsigned int flag) {
+int mmu_munmap(const void* mem, size_t size, unsigned int flag) {
     for (size_t off = 0; off < size; off += 4096) {
         const void* addr = (const uint8_t*)mem + off;
         uint32_t* pt = MMU_PT(addr);
@@ -130,7 +130,7 @@ bool mmu_munmap(const void* mem, size_t size, unsigned int flag) {
             }
         }
     }
-    return true;
+    return 0;
 }
 void INT_0E(uint32_t code, uint32_t addr, uint32_t ip) {
     uint32_t  page, prot, pd_index;

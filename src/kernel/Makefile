@@ -122,6 +122,7 @@ KERNEL_TEST_PROG :=$(patsubst test/%.cpp,$(KERNEL_TMP)%.test,$(KERNEL_TEST_CPP))
 kernel: $(KERNEL_BIN)
 $(KERNEL_BIN): $(KERNEL_TMP) $(KERNEL_OBJ) builtin-drivers Makefile
 	@echo "[LINK] $(notdir $@)"
+	@sync
 	@$(CROSS_LD) $(LDFLAGS) -Tarch/$(ARCH)/kernel.ld \
 	  -o $@ $(KERNEL_OBJ) \
 	  $(DRIVER_BUILTIN_A) \

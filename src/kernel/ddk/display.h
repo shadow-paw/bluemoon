@@ -7,22 +7,14 @@
 #include "driver.h"
 #include "bus.h"
 
-struct HAL_DISPLAY_;
+struct DRIVER_DISPLAY_;
 typedef struct {
-    unsigned int    mode;
-    int             width, height, bpp;
-    int             pitch;
+    unsigned int mode;
+    int          width, height, bpp;
+    int          pitch;
 } HAL_DISPLAY_MODEINFO;
-typedef struct DRIVER_DISPLAY_ {
-    DRIVER base;
-    int (*create)(struct DRIVER_DISPLAY_* driver, struct HAL_DISPLAY_* display);
-    int (*destroy)(struct DRIVER_DISPLAY_* driver, struct HAL_DISPLAY_* display);
-    int (*get_modeinfo)(struct HAL_DISPLAY_* display, unsigned int mode, HAL_DISPLAY_MODEINFO* info);
-    int (*set_mode)(struct HAL_DISPLAY_* display, unsigned int mode);
-    int (*clear_screen)(struct HAL_DISPLAY_* display);
-} DRIVER_DISPLAY;
-typedef struct HAL_DISPLAY_ {
-    DRIVER_DISPLAY*      driver;
+typedef struct {
+    struct DRIVER_DISPLAY_* driver;
     HAL_BUS_ADDR         bus_addr;
     HAL_BUS_INFO         bus_info;
     HAL_DISPLAY_MODEINFO mode_info;
@@ -30,5 +22,14 @@ typedef struct HAL_DISPLAY_ {
     uintptr_t            frame_buffer_addr;
     size_t               frame_buffer_size;
 } HAL_DISPLAY;
+
+typedef struct DRIVER_DISPLAY_ {
+    DRIVER base;
+    int (*open)(struct DRIVER_DISPLAY_* driver, HAL_DISPLAY* display, const HAL_BUS_ADDR* addr, const HAL_BUS_INFO* info);
+    int (*close)(struct DRIVER_DISPLAY_* driver, HAL_DISPLAY* display);
+    int (*get_modes)(HAL_DISPLAY* display, int mode, HAL_DISPLAY_MODEINFO* info);
+    int (*set_mode)(HAL_DISPLAY* display, int mode);
+    int (*clear_screen)(HAL_DISPLAY* display);
+} DRIVER_DISPLAY;
 
 #endif  // KERNEL_DDK_DISPLAY_H_
