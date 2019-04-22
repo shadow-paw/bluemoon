@@ -45,6 +45,7 @@ static inline void _INVLPG(const void* addr) {
 typedef volatile uint32_t _SPINLOCK __attribute__ ((aligned(16)));
 static inline void _SPIN_LOCK(_SPINLOCK* lock) {
     __asm (
+           "pushf\n"
            "cli\n"
            "lock bts %0, 0\n"
            "jnc 1f\n"
@@ -61,7 +62,12 @@ static inline void _SPIN_LOCK(_SPINLOCK* lock) {
            );
 }
 static inline void _SPIN_UNLOCK(_SPINLOCK* lock) {
-    *lock = 0;
+    __asm ("mov %0, 0\n"
+           "popf"
+           :
+           : "m"(lock)
+           :
+           );
 }
 
 #endif  // KERNEL_ARCH_I686_INLINEASM_H__
